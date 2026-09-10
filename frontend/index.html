@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buddiez & Bandz</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="page header-inner">
+      <a href="#" class="brand">
+        <div class="brand-icon"><span></span></div>
+        <div class="brand-copy">
+          Buddiez & Bandz
+          <small>EVENTS · PEOPLE · REAL CONNECTIONS</small>
+        </div>
+      </a>
+
+      <button class="location-select">
+        <span>📍</span>
+        <strong>USI / Evansville, IN</strong>
+        <span>⌄</span>
+      </button>
+
+      <nav class="nav">
+        <a class="nav-link active" href="#">
+          <span class="nav-icon">⌂</span>
+          <span>Home</span>
+        </a>
+        <a class="nav-link" href="#">
+          <span class="nav-icon">▣</span>
+          <span>Events</span>
+        </a>
+        <a class="nav-link" href="#">
+          <span class="nav-icon">♟</span>
+          <span>People</span>
+        </a>
+        <a class="nav-link" href="#">
+          <span class="nav-icon">●</span>
+          <span>Profile</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="hero">
+      <div class="hero-content">
+        <h1>
+          Discover campus events<br />
+          and <span>build connections.</span>
+        </h1>
+
+        <p>
+          Find events. Meet people with shared interests. Make the most of campus life.
+        </p>
+
+        <label class="hero-search">
+          <span>⌕</span>
+          <input
+            type="search"
+            placeholder="Search events, people, or interests..."
+            aria-label="Search events, people, or interests"
+          />
+        </label>
+      </div>
+
+      <div class="hero-note">
+        Same<br />
+        Campus<br />
+        Brighter<br />
+        People ♡
+      </div>
+    </section>
+
+    <div class="hero-actions">
+      <button class="action-btn primary">Browse Events &nbsp; →</button>
+      <button class="action-btn secondary">👥 &nbsp; Meet People</button>
+    </div>
+
+    <section class="dashboard">
+      <div class="events-panel">
+        <div class="section-title-row">
+          <h2>Upcoming Events</h2>
+          <a class="view-all" href="#">View All Events →</a>
+        </div>
+
+
+        <div class="events-grid" id="eventsGrid">
+          <!--
+            Add event cards here dynamically with JavaScript/API data.
+
+            Example structure:
+            <article class="event-card">
+              <div class="event-image event-image-placeholder"></div>
+              <div class="event-body">
+                <div>
+                  <div class="event-title"></div>
+                  <div class="event-meta">
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+                <button class="rsvp-btn">RSVP</button>
+              </div>
+            </article>
+          -->
+        </div>
+      </div>
+
+      <aside class="sidebar">
+        <section class="panel profile-panel">
+          <div class="panel-heading">
+            <h3>My Profile</h3>
+            <a href="#" class="edit-link">✎ Edit</a>
+          </div>
+
+          <div class="profile-main" id="userProfile">
+            <div class="profile-avatar profile-avatar-placeholder" id="profileImage"></div>
+
+            <div class="profile-details">
+              <h4 id="profileName"></h4>
+              <p id="profileStatus"></p>
+              <p class="location" id="profileLocation"></p>
+            </div>
+          </div>
+
+          <div class="chips" id="profileInterests">
+            <!-- User interests can be inserted here dynamically. -->
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
+</body>
+</html>
