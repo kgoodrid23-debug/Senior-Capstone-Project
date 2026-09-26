@@ -1,0 +1,16 @@
+{
+  "appId": "com.buddiezandbandz.app",
+  "appName": "Buddiez & Bandz",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": true
+  },
+  "server": {
+    "cleartext": true
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}
