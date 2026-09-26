@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buddiez &amp; Bandz | Meet People</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="directory-page-body">
+  <header class="site-header">
+      <div class="page header-inner">
+        <a href="index.html" class="brand">
+          <div class="brand-icon"><span></span></div>
+          <div class="brand-copy">
+            Buddiez &amp; Bandz
+            <small>EVENTS · PEOPLE · REAL CONNECTIONS</small>
+          </div>
+        </a>
+
+        <button class="location-select">
+          <span>📍</span>
+          <strong>USI / Evansville, IN</strong>
+          <span>⌄</span>
+        </button>
+
+        <nav class="nav">
+          <a class="nav-link" href="index.html">
+            <span class="nav-icon">⌂</span>
+            <span>Home</span>
+          </a>
+          <a class="nav-link" href="events.html">
+            <span class="nav-icon">▣</span>
+            <span>Events</span>
+          </a>
+          <a class="nav-link active" href="people.html">
+            <span class="nav-icon">♟</span>
+            <span>People</span>
+          </a>
+          <a class="nav-link" href="profile.html">
+            <span class="nav-icon">●</span>
+            <span>Profile</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+  <main class="page directory-main">
+    <section class="directory-heading">
+      <div><p class="directory-eyebrow">USI · EVANSVILLE</p><h1>Meet People</h1><p>Find students who share your interests.</p></div>
+      <label class="directory-search"><span aria-hidden="true">⌕</span><input id="directorySearch" type="search" placeholder="Search people..." aria-label="Search people" /></label>
+    </section>
+    <section aria-label="Meet People">
+      <div class="directory-title"><h2>Campus Community</h2><span id="resultCount" aria-live="polite"></span></div>
+      <div class="directory-people" id="directoryGrid"></div>
+      <p class="directory-empty" id="emptyMessage" hidden>No people found.</p>
+    </section>
+  </main>
+  <script src="data.js"></script>
+  <script src="directory.js"></script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buddiez &amp; Bandz | Explore Events</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="directory-page-body">
+  <header class="site-header">
+      <div class="page header-inner">
+        <a href="index.html" class="brand">
+          <div class="brand-icon"><span></span></div>
+          <div class="brand-copy">
+            Buddiez &amp; Bandz
+            <small>EVENTS · PEOPLE · REAL CONNECTIONS</small>
+          </div>
+        </a>
+
+        <button class="location-select">
+          <span>📍</span>
+          <strong>USI / Evansville, IN</strong>
+          <span>⌄</span>
+        </button>
+
+        <nav class="nav">
+          <a class="nav-link" href="index.html">
+            <span class="nav-icon">⌂</span>
+            <span>Home</span>
+          </a>
+          <a class="nav-link active" href="events.html">
+            <span class="nav-icon">▣</span>
+            <span>Events</span>
+          </a>
+          <a class="nav-link" href="people.html">
+            <span class="nav-icon">♟</span>
+            <span>People</span>
+          </a>
+          <a class="nav-link" href="profile.html">
+            <span class="nav-icon">●</span>
+            <span>Profile</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+  <main class="page directory-main">
+    <section class="directory-heading">
+      <div><p class="directory-eyebrow">USI · EVANSVILLE</p><h1>Explore Events</h1><p>See what’s happening around campus.</p></div>
+      <label class="directory-search"><span aria-hidden="true">⌕</span><input id="directorySearch" type="search" placeholder="Search events..." aria-label="Search events" /></label>
+    </section>
+    <section aria-label="Explore Events">
+      <div class="directory-title"><h2>Campus Events</h2><span id="resultCount" aria-live="polite"></span></div>
+      <div class="directory-events" id="directoryGrid"></div>
+      <p class="directory-empty" id="emptyMessage" hidden>No events found.</p>
+    </section>
+  </main>
+  <script src="data.js"></script>
+  <script src="directory.js"></script>
+</body>
+</html>
