@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Buddiez &amp; Bandz | Explore Events</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=20260929-universal-2" />
 </head>
-<body class="directory-page-body">
+<body class="theme-soft" data-directory="events">
   <header class="site-header">
-      <div class="page header-inner">
+      <div class="container header-inner">
         <a href="index.html" class="brand">
           <div class="brand-icon"><span></span></div>
           <div class="brand-copy">
@@ -43,18 +43,18 @@
         </nav>
       </div>
     </header>
-  <main class="page directory-main">
+  <main class="container content content--directory">
     <section class="directory-heading">
       <div><p class="directory-eyebrow">USI · EVANSVILLE</p><h1>Explore Events</h1><p>See what’s happening around campus.</p></div>
-      <label class="directory-search"><span aria-hidden="true">⌕</span><input id="directorySearch" type="search" placeholder="Search events..." aria-label="Search events" /></label>
+      <label class="search-field search-field--compact"><span aria-hidden="true">⌕</span><input id="directorySearch" type="search" placeholder="Search events..." aria-label="Search events" /></label>
     </section>
     <section aria-label="Explore Events">
-      <div class="directory-title"><h2>Campus Events</h2><span id="resultCount" aria-live="polite"></span></div>
-      <div class="directory-events" id="directoryGrid"></div>
-      <p class="directory-empty" id="emptyMessage" hidden>No events found.</p>
+      <div class="section-header section-header--spaced"><h2 class="section-title">Campus Events</h2><span id="resultCount" aria-live="polite"></span></div>
+      <div class="grid grid--3" id="directoryGrid"></div>
+      <p class="empty-state" id="emptyMessage" hidden>No events found.</p>
     </section>
   </main>
-  <script src="data.js"></script>
-  <script src="directory.js"></script>
+  <script src="data.js?v=20260929-universal-2"></script>
+  <script src="directory.js?v=20260929-universal-2"></script>
 </body>
 </html>

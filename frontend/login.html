@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | Senior Buddies & Bandz</title>
+
+    <link rel="stylesheet" href="style.css?v=20260929-universal-2">
+</head>
+
+<body class="theme-soft">
+    <main class="auth-layout">
+        <section class="card card--padded auth-card">
+            <a href="index.html" class="brand">
+                <div class="brand-icon">
+                    <span></span>
+                </div>
+
+                <div class="brand-copy">
+                    Senior Buddies & Bandz
+                    <small>CONNECT • EXPERIENCE • BELONG</small>
+                </div>
+            </a>
+
+            <div class="auth-heading">
+                <h1>Welcome back</h1>
+                <p>Sign in to continue connecting and discovering events.</p>
+            </div>
+
+            <form id="loginForm" class="form-stack">
+                <div class="form-field">
+                    <label for="email">
+                        Email Address
+                    </label>
+
+                    <input class="field-control"
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="form-field">
+                    <div class="field-heading">
+                        <label for="password">
+                            Password
+                        </label>
+
+                        <a class="text-link" href="forgot-password.html">
+                            Forgot password?
+                        </a>
+                    </div>
+
+                    <input class="field-control"
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+                <label class="checkbox-field">
+                    <input
+                        type="checkbox"
+                        id="remember"
+                        name="remember"
+                    >
+                    <span>Remember me</span>
+                </label>
+
+                <p
+                    id="loginError"
+                    class="form-error" role="alert" aria-live="polite"
+                ></p>
+
+                <button
+                    type="submit"
+                    class="btn btn--primary btn--block"
+                >
+                    Sign In
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <span>New to Senior Buddies & Bandz?</span>
+                <a class="text-link" href="register.html">
+                    Create an account
+                </a>
+            </div>
+        </section>
+
+        <a href="index.html" class="text-link">
+            ← Back to home
+        </a>
+
+    </main>
+    <script src="login.js"></script>
+</body>
+</html>

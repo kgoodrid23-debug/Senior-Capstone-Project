@@ -16,3 +16,10 @@ services:
     command: >
       sh -c "pip install -r requirements.txt &&
              flask --app app run --host=0.0.0.0 --port=5000"
+  #database:
+  #  image: mySql:8.0
+  #  environment:
+  #    MYSQL_ROOT_PASSWORD: rootpassword
+  #    MYSQL_DATABASE: mydatabase
+  #    MYSQL_USER: myuser
+  #    MYSQL_PASSWORD: mypassword
