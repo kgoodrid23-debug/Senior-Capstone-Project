@@ -269,3 +269,9 @@ a { color: inherit; text-decoration: none; }
 .form-error:empty { display: none; }
 .auth-footer { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 24px; font-size: 14px; color: var(--muted); }
 @media (max-width: 760px) { .auth-card { padding: 24px; } }
+
+.container--narrow { max-width: 640px; }
+textarea.field-control { min-height: 80px; resize: vertical; }
+.field-control:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+.form-fieldset { min-width: 0; border: 0; }
+.form-fieldset legend { font-weight: 700; font-size: 14px; }
