@@ -1,0 +1,3 @@
+functions-framework
+mysql-connector-python
+python-dotenv

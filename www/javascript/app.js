@@ -71,21 +71,31 @@ function renderProfile(
   if (!profile) return;
 
   if (profileNameEl) {
-    profileNameEl.textContent = profile.name || "Profile unavailable";
+    profileNameEl.textContent =
+      profile.display_name || "Profile unavailable";
   }
-  if (profileStatusEl) profileStatusEl.textContent = profile.status || "";
+
+  if (profileStatusEl) {
+    profileStatusEl.textContent = profile.bio || "";
+  }
+
   if (profileLocationEl) {
     profileLocationEl.textContent = profile.location || "";
   }
 
-  if (profileImageEl && profile.photo_url) {
-    profileImageEl.style.backgroundImage = `url("${encodeURI(profile.photo_url)}")`;
+  if (profileImageEl && profile.profile_photo_url) {
+    profileImageEl.style.backgroundImage =
+      `url("${encodeURI(profile.profile_photo_url)}")`;
+
     profileImageEl.classList.add("has-image");
   }
 
   if (profileInterestsEl) {
     profileInterestsEl.replaceChildren();
-    const interests = Array.isArray(profile.interests) ? profile.interests : [];
+
+    const interests = Array.isArray(profile.interests)
+      ? profile.interests
+      : [];
 
     interests.forEach((interest) => {
       const chip = document.createElement("span");
