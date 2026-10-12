@@ -118,6 +118,8 @@ def retrieve_events_api():
         connection.close()
 
 
+
+
 @functions_framework.http
 def api(request):
     path = request.path.rstrip("/")
@@ -141,6 +143,22 @@ def api(request):
         except Exception as error:
             return jsonify({
                 "error": "Unable to retrieve events",
+                "details": str(error)
+            }), 500
+
+    if request.method == "GET" and path.endswith("/api/dashboard"):
+        try:
+            events = retrieve_events_api()
+            profiles = retrieve_profiles_api()
+
+            return jsonify({
+                "profile": profiles[0] if profiles else None,
+                "events": events
+            })
+
+        except Exception as error:
+            return jsonify({
+                "error": "Unable to retrieve dashboard data",
                 "details": str(error)
             }), 500
 
