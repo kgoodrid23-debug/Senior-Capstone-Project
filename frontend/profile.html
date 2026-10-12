@@ -4,11 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Buddiez & Bandz | Profile</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=20260929-universal-2" />
   </head>
-  <body class="profile-page-body">
+  <body class="theme-soft">
     <header class="site-header">
-      <div class="page header-inner">
+      <div class="container header-inner">
         <a href="index.html" class="brand">
           <div class="brand-icon"><span></span></div>
           <div class="brand-copy">
@@ -44,14 +44,14 @@
       </div>
     </header>
 
-    <main class="page profile-main">
-      <section class="profile-card">
+    <main class="container content">
+      <section class="card">
         <div class="profile-banner" aria-hidden="true"></div>
 
         <div class="profile-card-body">
           <div class="profile-photo-wrap">
             <img
-              class="profile-photo"
+              class="media-fill"
               src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=900&q=80"
               alt="Maya Carter portrait"
             />
@@ -64,27 +64,27 @@
               Computer science student who loves good people, good events, and making the most of college life.
             </p>
 
-            <div class="profile-tags" aria-label="Profile interests">
-              <span class="tag green"><span>🏋</span> Fitness</span>
-              <span class="tag purple"><span>🏐</span> Volleyball</span>
-              <span class="tag blue"><span>✝</span> Church</span>
-              <span class="tag pink"><span>♫</span> Music</span>
+            <div class="badge-list" aria-label="Profile interests">
+              <span class="badge badge--tag badge--green"><span>🏋</span> Fitness</span>
+              <span class="badge badge--tag badge--purple"><span>🏐</span> Volleyball</span>
+              <span class="badge badge--tag badge--blue"><span>✝</span> Church</span>
+              <span class="badge badge--tag badge--pink"><span>♫</span> Music</span>
             </div>
           </div>
 
-          <button class="edit-button" type="button">✎ Edit Profile</button>
+          <button class="btn btn--primary profile-edit-position" type="button">✎ Edit Profile</button>
         </div>
       </section>
 
-      <section class="profile-lower-grid">
-        <section class="panel events-panel">
-          <div class="panel-header">
-            <h2>Upcoming Events</h2>
-            <a href="events.html">View All <span>→</span></a>
+      <section class="layout layout--profile">
+        <section class="card card--plain">
+          <div class="section-header">
+            <h2 class="section-title section-title--large">Upcoming Events</h2>
+            <a class="text-link" href="events.html">View All <span>→</span></a>
           </div>
 
-          <div class="event-grid">
-            <article class="event-card">
+          <div class="grid grid--2">
+            <article class="card card--event">
               <div
                 class="event-image"
                 style="background-image: url('https://images.unsplash.com/photo-1501612780327-45045538702b?auto=format&fit=crop&w=1200&q=80');"
@@ -97,7 +97,7 @@
               </div>
             </article>
 
-            <article class="event-card">
+            <article class="card card--event">
               <div
                 class="event-image"
                 style="background-image: url('https://images.unsplash.com/photo-1547347298-4074fc3086f0?auto=format&fit=crop&w=1200&q=80');"
@@ -112,27 +112,27 @@
           </div>
         </section>
 
-        <aside class="panel connections-panel">
-          <div class="panel-header">
-            <h2>Connections</h2>
-            <a href="connections.html">View All <span>→</span></a>
+        <aside class="card card--padded card--sidebar">
+          <div class="section-header">
+            <h2 class="section-title section-title--large">Connections</h2>
+            <a class="text-link" href="connections.html">View All <span>→</span></a>
           </div>
 
-          <div class="connection-grid">
+          <div class="grid grid--4">
             <div class="connection-item">
-              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&q=80" alt="Jaden" />
+              <img class="avatar avatar--medium avatar--centered" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&q=80" alt="Jaden" />
               <span>Jaden</span>
             </div>
             <div class="connection-item">
-              <img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=500&q=80" alt="Sophie" />
+              <img class="avatar avatar--medium avatar--centered" src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=500&q=80" alt="Sophie" />
               <span>Sophie</span>
             </div>
             <div class="connection-item">
-              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=500&q=80" alt="Marcus" />
+              <img class="avatar avatar--medium avatar--centered" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=500&q=80" alt="Marcus" />
               <span>Marcus</span>
             </div>
             <div class="connection-item">
-              <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=500&q=80" alt="Emma" />
+              <img class="avatar avatar--medium avatar--centered" src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=500&q=80" alt="Emma" />
               <span>Emma</span>
             </div>
           </div>

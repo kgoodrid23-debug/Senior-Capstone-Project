@@ -31,7 +31,7 @@ function renderProfile(profile, profileNameEl, profileStatusEl, profileLocationE
 
   if (profileInterestsEl && Array.isArray(profile.interests)) {
     profileInterestsEl.innerHTML = profile.interests
-      .map((interest) => `<span class="chip">${interest}</span>`)
+      .map((interest) => `<span class="badge">${interest}</span>`)
       .join("");
   }
 }
@@ -47,8 +47,8 @@ function renderEvents(events, eventsGridEl) {
   eventsGridEl.innerHTML = events
     .map(
       (event) => `
-        <article class="event-card">
-          <div class="event-image event-image-placeholder"></div>
+        <article class="card card--event">
+          <div class="event-image placeholder"></div>
           <div class="event-body">
             <div>
               <div class="event-title">${event.title}</div>
@@ -57,10 +57,11 @@ function renderEvents(events, eventsGridEl) {
                 <span>${event.location}</span>
               </div>
             </div>
-            <button class="rsvp-btn">${event.category}</button>
+
+            <button class="btn btn--primary" type="button">${event.category}</button>
           </div>
         </article>
-      `
+      ` 
     )
     .join("");
 }

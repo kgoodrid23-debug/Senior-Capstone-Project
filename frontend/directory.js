@@ -9,7 +9,7 @@ const grid = document.getElementById("directoryGrid");
 const search = document.getElementById("directorySearch");
 const count = document.getElementById("resultCount");
 const empty = document.getElementById("emptyMessage");
-const isEvents = location.pathname.endsWith("events.html");
+const isEvents = document.body.dataset.directory === "events";
 let items = [];
 
 function makeElement(tag, className, text) {
@@ -20,10 +20,10 @@ function makeElement(tag, className, text) {
 }
 
 function renderEvent(event) {
-  const card = makeElement("article", "directory-event-card");
+  const card = makeElement("article", "card");
   const cover = makeElement("div", "directory-event-cover");
   cover.setAttribute("aria-hidden", "true");
-  cover.append(makeElement("span", "directory-event-category", event.category || "Campus event"));
+  cover.append(makeElement("span", "badge badge--category", event.category || "Campus event"));
   const content = makeElement("div", "directory-event-content");
   content.append(makeElement("h3", "", event.title || "Untitled event"));
   content.append(makeElement("p", "", `📅 ${event.date || "Date to be announced"}`));
@@ -33,16 +33,16 @@ function renderEvent(event) {
 }
 
 function renderPerson(person) {
-  const card = makeElement("article", "directory-person-card");
-  const image = makeElement("img", "directory-person-photo");
+  const card = makeElement("article", "card card--person");
+  const image = makeElement("img", "avatar avatar--square");
   image.src = person.photo;
   image.alt = `${person.name} portrait`;
   const details = makeElement("div", "directory-person-details");
   details.append(makeElement("h3", "", person.name));
   details.append(makeElement("p", "", person.role));
-  details.append(makeElement("p", "directory-person-location", `📍 ${person.location}`));
-  const tags = makeElement("div", "chips");
-  person.interests.forEach(interest => tags.append(makeElement("span", "chip", interest)));
+  details.append(makeElement("p", "", `📍 ${person.location}`));
+  const tags = makeElement("div", "badge-list");
+  person.interests.forEach(interest => tags.append(makeElement("span", "badge", interest)));
   details.append(tags);
   card.append(image, details);
   return card;

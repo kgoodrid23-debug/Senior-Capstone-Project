@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Buddiez & Bandz</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=20260929-universal-2" />
 </head>
 
 <body>
   <header class="site-header">
-    <div class="page header-inner">
+    <div class="container header-inner">
       <a href="index.html" class="brand">
         <div class="brand-icon"><span></span></div>
         <div class="brand-copy">
@@ -25,7 +25,7 @@
       </button>
 
       <nav class="nav">
-        <a class="nav-link active" href="#">
+        <a class="nav-link active" href="index.html">
           <span class="nav-icon">⌂</span>
           <span>Home</span>
         </a>
@@ -37,7 +37,7 @@
           <span class="nav-icon">♟</span>
           <span>People</span>
         </a>
-        <a class="nav-link" href="profile.html">
+        <a class="nav-link" href="login.html">
           <span class="nav-icon">●</span>
           <span>Profile</span>
         </a>
@@ -45,7 +45,7 @@
     </div>
   </header>
 
-  <main class="page">
+  <main class="container">
     <section class="hero">
       <div class="hero-content">
         <h1>
@@ -57,7 +57,7 @@
           Find events. Meet people with shared interests. Make the most of campus life.
         </p>
 
-        <label class="hero-search">
+        <label class="search-field search-field--hero">
           <span>⌕</span>
           <input
             type="search"
@@ -75,33 +75,33 @@
       </div>
     </section>
 
-    <div class="hero-actions">
-      <a class="action-btn primary" href="events.html">Browse Events &nbsp; →</a>
-      <a class="action-btn secondary" href="people.html">👥 &nbsp; Meet People</a>
+    <div class="button-group">
+      <a class="btn btn--large btn--primary" href="events.html">Browse Events &nbsp; →</a>
+      <a class="btn btn--large btn--secondary" href="people.html">👥 &nbsp; Meet People</a>
     </div>
 
-    <section class="dashboard">
-      <div class="events-panel">
-        <div class="section-title-row">
-          <h2>Upcoming Events</h2>
-          <a class="view-all" href="events.html">View All Events →</a>
+    <section class="layout layout--dashboard">
+      <div class="card card--plain">
+        <div class="section-header">
+          <h2 class="section-title">Upcoming Events</h2>
+          <a class="text-link" href="events.html">View All Events →</a>
         </div>
 
 
-        <div class="events-grid" id="eventsGrid">
+        <div class="grid grid--2" id="eventsGrid">
           
         </div>
       </div>
 
       <aside class="sidebar">
-        <section class="panel profile-panel">
-          <div class="panel-heading">
-            <h3>My Profile</h3>
-            <a href="#" class="edit-link">✎ Edit</a>
+        <section class="card card--padded card--sidebar">
+          <div class="section-header">
+            <h3 class="section-title section-title--small">My Profile</h3>
+            <a href="#" class="text-link">✎ Edit</a>
           </div>
 
-          <div class="profile-main" id="userProfile">
-            <div class="profile-avatar profile-avatar-placeholder" id="profileImage"></div>
+          <div class="profile-summary" id="userProfile">
+            <div class="avatar avatar--large placeholder" id="profileImage"></div>
 
             <div class="profile-details">
               <h4 id="profileName"></h4>
@@ -110,7 +110,7 @@
             </div>
           </div>
 
-          <div class="chips" id="profileInterests">
+          <div class="badge-list" id="profileInterests">
             
           </div>
         </section>
@@ -118,7 +118,7 @@
     </section>
   </main>
 
-  <script src="/data.js"></script>
-  <script src="/app.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Buddiez &amp; Bandz | Edit Profile</title>
+    <link rel="stylesheet" href="style.css?v=20260929-universal-3" />
+  </head>
+
+  <body class="theme-soft">
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="index.html" class="brand">
+          <div class="brand-icon"><span></span></div>
+          <div class="brand-copy">
+            Buddiez &amp; Bandz
+            <small>EVENTS · PEOPLE · REAL CONNECTIONS</small>
+          </div>
+        </a>
+
+        <button class="location-select" type="button">
+          <span>📍</span>
+          <strong id="header-location">Evansville, IN</strong>
+          <span>⌄</span>
+        </button>
+
+        <nav class="nav" aria-label="Main navigation">
+          <a class="nav-link" href="index.html">
+            <span class="nav-icon">⌂</span>
+            <span>Home</span>
+          </a>
+          <a class="nav-link" href="events.html">
+            <span class="nav-icon">▣</span>
+            <span>Events</span>
+          </a>
+          <a class="nav-link" href="people.html">
+            <span class="nav-icon">♟</span>
+            <span>People</span>
+          </a>
+          <a class="nav-link active" href="profile.html">
+            <span class="nav-icon">●</span>
+            <span>Profile</span>
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container container--narrow content">
+      <section class="card card--padded" aria-labelledby="edit-heading">
+        <div class="section-header">
+          <h1 class="section-title" id="edit-heading">Edit Profile</h1>
+        </div>
+
+        <form id="edit-form" class="form-stack">
+          <div class="grid grid--2">
+            <div class="form-field">
+              <label for="first">First name</label>
+              <input class="field-control" type="text" id="first" name="first" autocomplete="given-name" required />
+            </div>
+            <div class="form-field">
+              <label for="last">Last name</label>
+              <input class="field-control" type="text" id="last" name="last" autocomplete="family-name" required />
+            </div>
+          </div>
+
+          <div class="grid grid--2">
+            <div class="form-field">
+              <label for="age">Age</label>
+              <input class="field-control" type="text" id="age" name="age" inputmode="numeric" required />
+            </div>
+            <div class="form-field">
+              <label for="location">Location</label>
+              <input class="field-control" type="text" id="location" name="location" required />
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="bio">Bio</label>
+            <textarea class="field-control" id="bio" name="bio" rows="4"></textarea>
+          </div>
+
+          <fieldset class="form-fieldset">
+            <legend>Interests</legend>
+            <div class="badge-list">
+              <label class="badge badge--tag checkbox-field">
+                <input type="checkbox" name="tag" value="fitness" />
+                <span>🏋 Fitness</span>
+              </label>
+              <label class="badge badge--tag checkbox-field">
+                <input type="checkbox" name="tag" value="volleyball" />
+                <span>🏐 Volleyball</span>
+              </label>
+              <label class="badge badge--tag checkbox-field">
+                <input type="checkbox" name="tag" value="church" />
+                <span>✝ Church</span>
+              </label>
+              <label class="badge badge--tag checkbox-field">
+                <input type="checkbox" name="tag" value="music" />
+                <span>♫ Music</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="button-group">
+            <button type="submit" class="btn btn--primary">Save Changes</button>
+            <a href="profile.html" class="btn btn--outline">Cancel</a>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script>
+      // Defaults apply only when profile.html has not supplied a query value.
+      const DEFAULTS = {
+        first: "Maya",
+        last: "Carter",
+        age: "21",
+        location: "Evansville, IN",
+        bio: "Computer science student who loves good people, good events, and making the most of college life.",
+        tags: "fitness,volleyball,church,music",
+      };
+
+      const params = new URLSearchParams(window.location.search);
+
+      function getParam(key) {
+        return params.has(key) ? params.get(key) : DEFAULTS[key];
+      }
+
+      // Preserve the field IDs and parameter names used by profile.html.
+      document.getElementById("first").value = getParam("first");
+      document.getElementById("last").value = getParam("last");
+      document.getElementById("age").value = getParam("age");
+      document.getElementById("location").value = getParam("location");
+      document.getElementById("bio").value = getParam("bio");
+      document.getElementById("header-location").textContent = getParam("location");
+
+      const currentTags = getParam("tags").split(",").filter(Boolean);
+      document.querySelectorAll('input[name="tag"]').forEach((box) => {
+        box.checked = currentTags.includes(box.value);
+      });
+
+      document.getElementById("edit-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const selectedTags = Array.from(
+          document.querySelectorAll('input[name="tag"]:checked')
+        ).map((box) => box.value);
+
+        const out = new URLSearchParams({
+          first: document.getElementById("first").value.trim(),
+          last: document.getElementById("last").value.trim(),
+          age: document.getElementById("age").value.trim(),
+          location: document.getElementById("location").value.trim(),
+          bio: document.getElementById("bio").value.trim(),
+          tags: selectedTags.join(","),
+        });
+
+        // profile.html must read these parameters to display the edits.
+        window.location.href = "profile.html?" + out.toString();
+      });
+    </script>
+  </body>
+</html>

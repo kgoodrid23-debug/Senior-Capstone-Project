@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Buddiez &amp; Bandz | Meet People</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=20260929-universal-2" />
 </head>
-<body class="directory-page-body">
+<body class="theme-soft" data-directory="people">
   <header class="site-header">
-      <div class="page header-inner">
+      <div class="container header-inner">
         <a href="index.html" class="brand">
           <div class="brand-icon"><span></span></div>
           <div class="brand-copy">
@@ -43,15 +43,15 @@
         </nav>
       </div>
     </header>
-  <main class="page directory-main">
+  <main class="container content content--directory">
     <section class="directory-heading">
       <div><p class="directory-eyebrow">USI · EVANSVILLE</p><h1>Meet People</h1><p>Find students who share your interests.</p></div>
-      <label class="directory-search"><span aria-hidden="true">⌕</span><input id="directorySearch" type="search" placeholder="Search people..." aria-label="Search people" /></label>
+      <label class="search-field search-field--compact"><span aria-hidden="true">⌕</span><input id="directorySearch" type="search" placeholder="Search people..." aria-label="Search people" /></label>
     </section>
     <section aria-label="Meet People">
-      <div class="directory-title"><h2>Campus Community</h2><span id="resultCount" aria-live="polite"></span></div>
-      <div class="directory-people" id="directoryGrid"></div>
-      <p class="directory-empty" id="emptyMessage" hidden>No people found.</p>
+      <div class="section-header section-header--spaced"><h2 class="section-title">Campus Community</h2><span id="resultCount" aria-live="polite"></span></div>
+      <div class="grid grid--3" id="directoryGrid"></div>
+      <p class="empty-state" id="emptyMessage" hidden>No people found.</p>
     </section>
   </main>
   <script src="data.js"></script>
