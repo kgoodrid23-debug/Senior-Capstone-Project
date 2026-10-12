@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#3f55f4" />
+    <title>Buddiez &amp; Bandz | Profile</title>
+    <link rel="icon" href="assets/app-icon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="profile-page-body">
+    <header class="site-header">
+      <div class="page header-inner">
+        <a href="index.html" class="brand">
+          <div class="brand-icon"><span></span></div>
+          <div class="brand-copy">
+            Buddiez &amp; Bandz
+            <small>TESTS</small>
+          </div>
+        </a>
+
+        <button class="location-select" type="button">
+          <span>📍</span><strong>USI / Evansville, IN</strong><span>⌄</span>
+        </button>
+
+        <nav class="nav" aria-label="Primary navigation">
+          <a class="nav-link" href="index.html"><span class="nav-icon">⌂</span><span>Home</span></a>
+          <a class="nav-link" href="events.html"><span class="nav-icon">▣</span><span>Events</span></a>
+          <a class="nav-link" href="people.html"><span class="nav-icon">♟</span><span>People</span></a>
+          <a class="nav-link active" href="profile.html"><span class="nav-icon">●</span><span>Profile</span></a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="page profile-main">
+      <section class="profile-card">
+        <div class="profile-banner" aria-hidden="true"></div>
+        <div class="profile-card-body">
+          <div class="profile-photo-wrap">
+            <img
+              id="profilePhoto"
+              class="profile-photo"
+              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=900&q=80"
+              alt="Maya Carter portrait"
+            />
+          </div>
+
+          <div class="profile-info">
+            <h1 id="profileName">Maya<br />Carter, 21</h1>
+
+            <p id="profileLocation" class="profile-location">
+              Test, IN
+            </p>
+
+            <p id="profileBio" class="profile-bio">
+              Computer science student who loves good people, good events, and making the most of college life.
+            </p>
+
+            <div
+              id="profileInterests"
+              class="profile-tags"
+              aria-label="Profile interests"
+            >
+              <span class="tag green"><span>🏋</span> Fitness</span>
+              <span class="tag purple"><span>🏐</span> Volleyball</span>
+              <span class="tag blue"><span>✝</span> Church</span>
+              <span class="tag pink"><span>♫</span> Music</span>
+            </div>
+          </div>
+
+          <button id="editProfileButton" class="edit-button" type="button">
+            ✎ Edit Profile
+          </button>
+        </div>
+      </section>
+
+      <section class="profile-lower-grid">
+        <section class="panel events-panel">
+          <div class="panel-header">
+            <h2>Upcoming Events</h2>
+            <a href="events.html">View All <span>→</span></a>
+          </div>
+
+          <div id="profileEventsGrid" class="event-grid">
+          </div>
+            </article>
+          </div>
+        </section>
+
+        <aside class="panel connections-panel">
+          <div class="panel-header">
+            <h2>Connections</h2>
+            <a href="people.html">View All <span>→</span></a>
+          </div>
+
+          <div id="profileConnectionsGrid" class="connection-grid">
+            <div class="connection-item"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&q=80" alt="Jaden" /><span>Jaden</span></div>
+            <div class="connection-item"><img src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f0?auto=format&fit=crop&w=500&q=80" alt="Sophie" /><span>Sophie</span></div>
+            <div class="connection-item"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=500&q=80" alt="Marcus" /><span>Marcus</span></div>
+            <div class="connection-item"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=500&q=80" alt="Emma" /><span>Emma</span></div>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <nav class="mobile-nav" aria-label="Mobile navigation">
+      <a href="index.html"><span>⌂</span><small>Home</small></a>
+      <a href="events.html"><span>▣</span><small>Events</small></a>
+      <a href="people.html"><span>♟</span><small>People</small></a>
+      <a class="active" href="profile.html"><span>●</span><small>Profile</small></a>
+    </nav>
+
+    <script src="javascript/config.js"></script>
+    <script src="javascript/profiles.js"></script>
+  </body>
+</html>
