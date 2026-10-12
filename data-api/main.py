@@ -20,7 +20,7 @@ def get_db_connection():
     )
 
 
-def retrieve_profiles():
+def retrieve_profiles_api():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
@@ -78,7 +78,7 @@ def retrieve_profiles():
         cursor.close()
         connection.close()
 
-def retrieve_events():
+def retrieve_events_api():
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
 
@@ -124,7 +124,7 @@ def api(request):
 
     if request.method == "GET" and path.endswith("/api/profiles"):
         try:
-            profiles = retrieve_profiles()
+            profiles = retrieve_profiles_api()
             return jsonify(profiles)
 
         except Exception as error:
@@ -135,7 +135,7 @@ def api(request):
 
     if request.method == "GET" and path.endswith("/api/events"):
         try:
-            events = retrieve_events()
+            events = retrieve_events_api()
             return jsonify(events)
 
         except Exception as error:
