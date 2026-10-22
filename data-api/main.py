@@ -3,7 +3,7 @@ from datetime import date, datetime
 
 import firebase_admin
 import functions_framework
-from firebase_admin import firestore
+from firebase_admin import auth, firestore
 from flask import jsonify
 from google.cloud.firestore_v1.base_query import FieldFilter
 
@@ -83,6 +83,32 @@ def resolve_interest_names(interest_ids):
 
     return interests
 
+class AuthenticationError(Exception):
+    pass
+
+
+def get_authenticated_user(request):
+    authorization = request.headers.get("Authorization", "")
+
+    if not authorization.startswith("Bearer "):
+        raise AuthenticationError(
+            "Missing authentication token."
+        )
+
+    id_token = authorization.removeprefix("Bearer ").strip()
+
+    if not id_token:
+        raise AuthenticationError(
+            "Missing authentication token."
+        )
+
+    try:
+        return auth.verify_id_token(id_token)
+
+    except Exception as error:
+        raise AuthenticationError(
+            "Invalid or expired authentication token."
+        ) from error
 
 # ---------------------------------------------------------
 # Profiles
@@ -166,6 +192,58 @@ def retrieve_profile_api(user_id):
 
     return map_profile_document(document)
 
+def create_profile_api(user_id, email, profile_data):
+    """
+    Create the Firestore profile associated with an authenticated
+    Firebase user.
+    """
+
+    first_name = str(
+        profile_data.get("first_name", "")
+    ).strip()
+
+    last_name = str(
+        profile_data.get("last_name", "")
+    ).strip()
+
+    location = str(
+        profile_data.get("location", "")
+    ).strip()
+
+    date_of_birth = str(
+        profile_data.get("date_of_birth", "")
+    ).strip()
+
+    if not first_name or not last_name:
+        raise ValueError(
+            "First name and last name are required."
+        )
+
+    document_reference = (
+        db.collection("users")
+        .document(user_id)
+    )
+
+    existing_document = document_reference.get()
+
+    if existing_document.exists:
+        return retrieve_profile_api(user_id), False
+
+    document_reference.set({
+        "email": email,
+        "first_name": first_name,
+        "last_name": last_name,
+        "date_of_birth": date_of_birth,
+        "location": location,
+        "bio": "",
+        "profile_photo_url": "",
+        "interest_ids": [],
+        "role": "user",
+        "is_active": True,
+        "created_at": firestore.SERVER_TIMESTAMP
+    })
+
+    return retrieve_profile_api(user_id), True
 
 # ---------------------------------------------------------
 # Events
@@ -468,7 +546,6 @@ def retrieve_invitations_api(user_id=None):
 # ---------------------------------------------------------
 # Event attendees and RSVPs
 # ---------------------------------------------------------
-
 def map_attendee_document(document):
     attendee = document.to_dict() or {}
     user_id = attendee.get("user_id")
@@ -483,6 +560,9 @@ def map_attendee_document(document):
         ),
         "joined_at": make_json_safe(
             attendee.get("joined_at")
+        ),
+        "updated_at": make_json_safe(
+            attendee.get("updated_at")
         ),
         "profile": (
             retrieve_profile_api(user_id)
@@ -522,6 +602,95 @@ def retrieve_attendees_api(event_id=None):
 
     return attendees
 
+ALLOWED_RSVP_STATUSES = {
+    "going",
+    "interested"
+}
+
+
+def get_rsvp_reference(event_id, user_id):
+    document_id = f"{event_id}_{user_id}"
+
+    return (
+        db.collection("event_attendees")
+        .document(document_id)
+    )
+
+
+def retrieve_user_rsvp_api(event_id, user_id):
+    document = get_rsvp_reference(
+        event_id,
+        user_id
+    ).get()
+
+    if not document.exists:
+        return {
+            "event_id": event_id,
+            "user_id": user_id,
+            "status": None
+        }
+
+    return map_attendee_document(document)
+
+
+def save_user_rsvp_api(event_id, user_id, rsvp_data):
+    status = str(
+        rsvp_data.get("status", "going")
+    ).strip().lower()
+
+    if status not in ALLOWED_RSVP_STATUSES:
+        raise ValueError(
+            "RSVP status must be going or interested."
+        )
+
+    document_reference = get_rsvp_reference(
+        event_id,
+        user_id
+    )
+
+    existing_document = document_reference.get()
+    was_created = not existing_document.exists
+
+    attendance_data = {
+        "event_id": event_id,
+        "user_id": user_id,
+        "attendance_status": status,
+        "updated_at": firestore.SERVER_TIMESTAMP
+    }
+
+    if was_created:
+        attendance_data["joined_at"] = (
+            firestore.SERVER_TIMESTAMP
+        )
+
+    document_reference.set(
+        attendance_data,
+        merge=True
+    )
+
+    saved_document = document_reference.get()
+
+    return (
+        map_attendee_document(saved_document),
+        was_created
+    )
+
+
+def delete_user_rsvp_api(event_id, user_id):
+    document_reference = get_rsvp_reference(
+        event_id,
+        user_id
+    )
+
+    document_reference.delete()
+
+    return {
+        "event_id": event_id,
+        "user_id": user_id,
+        "status": None,
+        "message": "RSVP cancelled"
+    }
+
 
 # ---------------------------------------------------------
 # HTTP routes
@@ -535,24 +704,144 @@ def api(request):
         if part
     ]
 
-    if request.method != "GET":
-        return jsonify({
-            "error": "Method not allowed",
-            "method": request.method
-        }), 405
+
 
     try:
+                # POST /api/profiles
+        if (
+            request.method == "POST"
+            and path_parts == ["api", "profiles"]
+        ):
+            authenticated_user = get_authenticated_user(
+                request
+            )
+
+            profile_data = request.get_json(
+                silent=True
+            )
+
+            if not isinstance(profile_data, dict):
+                return jsonify({
+                    "error": "A JSON request body is required"
+                }), 400
+
+            try:
+                profile, was_created = create_profile_api(
+                    authenticated_user["uid"],
+                    authenticated_user.get("email", ""),
+                    profile_data
+                )
+            except ValueError as error:
+                return jsonify({
+                    "error": str(error)
+                }), 400
+
+            status_code = 201 if was_created else 200
+
+            return jsonify(profile), status_code
+
+                # GET, PUT, or DELETE /api/events/{event_id}/rsvp
+        if (
+            len(path_parts) == 4
+            and path_parts[0] == "api"
+            and path_parts[1] == "events"
+            and path_parts[3] == "rsvp"
+        ):
+            authenticated_user = get_authenticated_user(
+                request
+            )
+
+            user_id = authenticated_user["uid"]
+            event_id = path_parts[2]
+
+            event = retrieve_event_api(event_id)
+
+            if not event:
+                return jsonify({
+                    "error": "Event not found"
+                }), 404
+
+            if request.method == "GET":
+                return jsonify(
+                    retrieve_user_rsvp_api(
+                        event_id,
+                        user_id
+                    )
+                )
+
+            if request.method == "PUT":
+                if not retrieve_profile_api(user_id):
+                    return jsonify({
+                        "error": (
+                            "Profile not found for "
+                            "authenticated user"
+                        )
+                    }), 404
+
+                rsvp_data = (
+                    request.get_json(silent=True)
+                    or {}
+                )
+
+                if not isinstance(rsvp_data, dict):
+                    return jsonify({
+                        "error": (
+                            "A JSON request body is required"
+                        )
+                    }), 400
+
+                try:
+                    rsvp, was_created = (
+                        save_user_rsvp_api(
+                            event_id,
+                            user_id,
+                            rsvp_data
+                        )
+                    )
+                except ValueError as error:
+                    return jsonify({
+                        "error": str(error)
+                    }), 400
+
+                status_code = (
+                    201 if was_created else 200
+                )
+
+                return jsonify(rsvp), status_code
+
+            if request.method == "DELETE":
+                return jsonify(
+                    delete_user_rsvp_api(
+                        event_id,
+                        user_id
+                    )
+                )
+
+            return jsonify({
+                "error": "Method not allowed",
+                "method": request.method
+            }), 405
+
+        # Reject unsupported HTTP methods after checking writes.
+        if request.method != "GET":
+            return jsonify({
+                "error": "Method not allowed",
+                "method": request.method
+            }), 405
         # GET /api/dashboard
         if path_parts == ["api", "dashboard"]:
-            requested_user_id = request.args.get("user_id")
+            authenticated_user = get_authenticated_user(request)
+            authenticated_user_id = authenticated_user["uid"]
 
-            if requested_user_id:
-                profile = retrieve_profile_api(
-                    requested_user_id
-                )
-            else:
-                profiles = retrieve_profiles_api()
-                profile = profiles[0] if profiles else None
+            profile = retrieve_profile_api(
+                authenticated_user_id
+            )
+
+            if not profile:
+                return jsonify({
+                    "error": "Profile not found for authenticated user",
+                    "user_id": authenticated_user_id
+                }), 404
 
             return jsonify({
                 "profile": profile,
@@ -561,14 +850,18 @@ def api(request):
 
         # GET /api/profiles
         if path_parts == ["api", "profiles"]:
-            return jsonify(retrieve_profiles_api())
+            return jsonify(
+                retrieve_profiles_api()
+            )
 
         # GET /api/profiles/{user_id}
         if (
             len(path_parts) == 3
             and path_parts[:2] == ["api", "profiles"]
         ):
-            profile = retrieve_profile_api(path_parts[2])
+            profile = retrieve_profile_api(
+                path_parts[2]
+            )
 
             if not profile:
                 return jsonify({
@@ -579,7 +872,9 @@ def api(request):
 
         # GET /api/events
         if path_parts == ["api", "events"]:
-            return jsonify(retrieve_events_api())
+            return jsonify(
+                retrieve_events_api()
+            )
 
         # GET /api/events/{event_id}/attendees
         if (
@@ -589,7 +884,9 @@ def api(request):
             and path_parts[3] == "attendees"
         ):
             return jsonify(
-                retrieve_attendees_api(path_parts[2])
+                retrieve_attendees_api(
+                    path_parts[2]
+                )
             )
 
         # GET /api/events/{event_id}
@@ -597,7 +894,9 @@ def api(request):
             len(path_parts) == 3
             and path_parts[:2] == ["api", "events"]
         ):
-            event = retrieve_event_api(path_parts[2])
+            event = retrieve_event_api(
+                path_parts[2]
+            )
 
             if not event:
                 return jsonify({
@@ -608,11 +907,15 @@ def api(request):
 
         # GET /api/interests
         if path_parts == ["api", "interests"]:
-            return jsonify(retrieve_interests_api())
+            return jsonify(
+                retrieve_interests_api()
+            )
 
         # GET /api/connections
         if path_parts == ["api", "connections"]:
-            return jsonify(retrieve_connections_api())
+            return jsonify(
+                retrieve_connections_api()
+            )
 
         # GET /api/users/{user_id}/connections
         if (
@@ -622,12 +925,16 @@ def api(request):
             and path_parts[3] == "connections"
         ):
             return jsonify(
-                retrieve_connections_api(path_parts[2])
+                retrieve_connections_api(
+                    path_parts[2]
+                )
             )
 
-        # GET /api/event-invitations
+        # GET /api/event_invitations
         if path_parts == ["api", "event_invitations"]:
-            return jsonify(retrieve_invitations_api())
+            return jsonify(
+                retrieve_invitations_api()
+            )
 
         # GET /api/users/{user_id}/invitations
         if (
@@ -637,18 +944,28 @@ def api(request):
             and path_parts[3] == "invitations"
         ):
             return jsonify(
-                retrieve_invitations_api(path_parts[2])
+                retrieve_invitations_api(
+                    path_parts[2]
+                )
             )
 
         # GET /api/event_attendees
         if path_parts == ["api", "event_attendees"]:
-            return jsonify(retrieve_attendees_api())
+            return jsonify(
+                retrieve_attendees_api()
+            )
 
         return jsonify({
             "error": "Endpoint not found",
             "method": request.method,
             "path": request.path
         }), 404
+
+    except AuthenticationError as error:
+        return jsonify({
+            "error": "Authentication required",
+            "details": str(error)
+        }), 401
 
     except Exception as error:
         return jsonify({

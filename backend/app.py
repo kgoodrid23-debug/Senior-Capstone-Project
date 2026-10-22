@@ -11,7 +11,11 @@ from controllers.data_api_controller import (
     retrieve_interests,
     retrieve_invitations,
     retrieve_profiles,
-)
+    create_profile,
+    delete_event_rsvp,
+    retrieve_event_rsvp,
+    save_event_rsvp
+    )
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,7 +51,7 @@ def return_data_api_response(controller_call):
 
 @app.get("/")
 def home():
-    return send_file(FRONTEND_DIR / "index.html")
+    return send_file(FRONTEND_DIR / "login.html")
 
 
 # ---------------------------------------------------------
@@ -56,10 +60,13 @@ def home():
 
 @app.get("/api/dashboard")
 def dashboard():
-    user_id = request.args.get("user_id")
+    authorization = request.headers.get(
+        "Authorization",
+        ""
+    )
 
     return return_data_api_response(
-        lambda: retrieve_dashboard(user_id)
+        lambda: retrieve_dashboard(authorization)
     )
 
 
@@ -78,6 +85,29 @@ def profiles():
 def profile_by_id(user_id):
     return return_data_api_response(
         lambda: retrieve_profiles(user_id)
+    )
+
+@app.post("/api/profiles")
+def create_profile_route():
+    authorization = request.headers.get(
+        "Authorization",
+        ""
+    )
+
+    profile_data = request.get_json(
+        silent=True
+    )
+
+    if not isinstance(profile_data, dict):
+        return jsonify({
+            "error": "A JSON request body is required"
+        }), 400
+
+    return return_data_api_response(
+        lambda: create_profile(
+            profile_data,
+            authorization
+        )
     )
 
 
@@ -161,6 +191,62 @@ def user_invitations(user_id):
 def all_event_attendees():
     return return_data_api_response(
         retrieve_attendees
+    )
+
+@app.get("/api/events/<event_id>/rsvp")
+def event_rsvp(event_id):
+    authorization = request.headers.get(
+        "Authorization",
+        ""
+    )
+
+    return return_data_api_response(
+        lambda: retrieve_event_rsvp(
+            event_id,
+            authorization
+        )
+    )
+
+
+@app.put("/api/events/<event_id>/rsvp")
+def save_rsvp(event_id):
+    authorization = request.headers.get(
+        "Authorization",
+        ""
+    )
+
+    rsvp_data = request.get_json(
+        silent=True
+    ) or {}
+
+    if not isinstance(rsvp_data, dict):
+        return jsonify({
+            "error": "A JSON request body is required"
+        }), 400
+
+    status = rsvp_data.get("status", "going")
+
+    return return_data_api_response(
+        lambda: save_event_rsvp(
+            event_id,
+            status,
+            authorization
+        )
+    )
+
+
+@app.delete("/api/events/<event_id>/rsvp")
+def cancel_rsvp(event_id):
+    authorization = request.headers.get(
+        "Authorization",
+        ""
+    )
+
+    return return_data_api_response(
+        lambda: delete_event_rsvp(
+            event_id,
+            authorization
+        )
     )
 
 

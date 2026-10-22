@@ -7,3 +7,5 @@ __pycache__/
 .idea/
 .vscode/
 .env
+firebase-auth.js
+firebase-config.js
