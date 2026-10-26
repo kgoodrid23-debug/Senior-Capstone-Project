@@ -805,21 +805,20 @@ def api(request):
         if part
     ]
 
-
-
     try:
+        # Every API request must contain a valid Firebase ID token.
+        authenticated_user = get_authenticated_user(request)
+        authenticated_user_id = authenticated_user["uid"]
+
+        # -----------------------------------------------------
         # POST /api/profiles
+        # -----------------------------------------------------
+
         if (
             request.method == "POST"
             and path_parts == ["api", "profiles"]
         ):
-            authenticated_user = get_authenticated_user(
-                request
-            )
-
-            profile_data = request.get_json(
-                silent=True
-            )
+            profile_data = request.get_json(silent=True)
 
             if not isinstance(profile_data, dict):
                 return jsonify({
@@ -828,7 +827,7 @@ def api(request):
 
             try:
                 profile, was_created = create_profile_api(
-                    authenticated_user["uid"],
+                    authenticated_user_id,
                     authenticated_user.get("email", ""),
                     profile_data
                 )
@@ -838,61 +837,45 @@ def api(request):
                 }), 400
 
             status_code = 201 if was_created else 200
-
             return jsonify(profile), status_code
 
+        # -----------------------------------------------------
         # POST /api/connections
+        # -----------------------------------------------------
+
         if (
             request.method == "POST"
             and path_parts == ["api", "connections"]
         ):
-            authenticated_user = get_authenticated_user(
-                request
-            )
-
-            requester_user_id = authenticated_user["uid"]
-
-            request_data = request.get_json(
-                silent=True
-            )
+            request_data = request.get_json(silent=True)
 
             if not isinstance(request_data, dict):
                 return jsonify({
-                    "error": (
-                        "A JSON request body is required"
-                    )
+                    "error": "A JSON request body is required"
                 }), 400
 
             recipient_user_id = str(
-                request_data.get(
-                    "recipient_user_id",
-                    ""
-                )
+                request_data.get("recipient_user_id", "")
             ).strip()
 
             if not recipient_user_id:
                 return jsonify({
-                    "error": (
-                        "recipient_user_id is required"
-                    )
+                    "error": "recipient_user_id is required"
                 }), 400
 
-            if requester_user_id == recipient_user_id:
+            if authenticated_user_id == recipient_user_id:
                 return jsonify({
-                    "error": (
-                        "You cannot connect with yourself."
-                    )
+                    "error": "You cannot connect with yourself."
                 }), 400
 
             requester_profile = retrieve_profile_api(
-                requester_user_id
+                authenticated_user_id
             )
 
             if not requester_profile:
                 return jsonify({
                     "error": (
-                        "Profile not found for "
-                        "authenticated user"
+                        "Profile not found for authenticated user"
                     )
                 }), 404
 
@@ -906,35 +889,28 @@ def api(request):
                 }), 404
 
             try:
-                connection, was_created = (
-                    create_connection_api(
-                        requester_user_id,
-                        recipient_user_id
-                    )
+                connection, was_created = create_connection_api(
+                    authenticated_user_id,
+                    recipient_user_id
                 )
             except ValueError as error:
                 return jsonify({
                     "error": str(error)
                 }), 400
 
-            status_code = (
-                201 if was_created else 200
-            )
-
+            status_code = 201 if was_created else 200
             return jsonify(connection), status_code
 
-        # GET, PUT, or DELETE /api/events/{event_id}/rsvp
+        # -----------------------------------------------------
+        # GET, PUT, DELETE /api/events/{event_id}/rsvp
+        # -----------------------------------------------------
+
         if (
             len(path_parts) == 4
             and path_parts[0] == "api"
             and path_parts[1] == "events"
             and path_parts[3] == "rsvp"
         ):
-            authenticated_user = get_authenticated_user(
-                request
-            )
-
-            user_id = authenticated_user["uid"]
             event_id = path_parts[2]
 
             event = retrieve_event_api(event_id)
@@ -948,12 +924,14 @@ def api(request):
                 return jsonify(
                     retrieve_user_rsvp_api(
                         event_id,
-                        user_id
+                        authenticated_user_id
                     )
                 )
 
             if request.method == "PUT":
-                if not retrieve_profile_api(user_id):
+                if not retrieve_profile_api(
+                    authenticated_user_id
+                ):
                     return jsonify({
                         "error": (
                             "Profile not found for "
@@ -974,12 +952,10 @@ def api(request):
                     }), 400
 
                 try:
-                    rsvp, was_created = (
-                        save_user_rsvp_api(
-                            event_id,
-                            user_id,
-                            rsvp_data
-                        )
+                    rsvp, was_created = save_user_rsvp_api(
+                        event_id,
+                        authenticated_user_id,
+                        rsvp_data
                     )
                 except ValueError as error:
                     return jsonify({
@@ -996,7 +972,7 @@ def api(request):
                 return jsonify(
                     delete_user_rsvp_api(
                         event_id,
-                        user_id
+                        authenticated_user_id
                     )
                 )
 
@@ -1005,24 +981,27 @@ def api(request):
                 "method": request.method
             }), 405
 
-        # Reject other unsupported HTTP methods.
+        # All remaining routes are GET-only.
         if request.method != "GET":
             return jsonify({
                 "error": "Method not allowed",
                 "method": request.method
             }), 405
-        # GET /api/dashboard
-        if path_parts == ["api", "dashboard"]:
-            authenticated_user = get_authenticated_user(request)
-            authenticated_user_id = authenticated_user["uid"]
 
+        # -----------------------------------------------------
+        # GET /api/dashboard
+        # -----------------------------------------------------
+
+        if path_parts == ["api", "dashboard"]:
             profile = retrieve_profile_api(
                 authenticated_user_id
             )
 
             if not profile:
                 return jsonify({
-                    "error": "Profile not found for authenticated user",
+                    "error": (
+                        "Profile not found for authenticated user"
+                    ),
                     "user_id": authenticated_user_id
                 }), 404
 
@@ -1031,13 +1010,19 @@ def api(request):
                 "events": retrieve_events_api()
             })
 
+        # -----------------------------------------------------
         # GET /api/profiles
+        # -----------------------------------------------------
+
         if path_parts == ["api", "profiles"]:
             return jsonify(
                 retrieve_profiles_api()
             )
 
+        # -----------------------------------------------------
         # GET /api/profiles/{user_id}
+        # -----------------------------------------------------
+
         if (
             len(path_parts) == 3
             and path_parts[:2] == ["api", "profiles"]
@@ -1053,26 +1038,40 @@ def api(request):
 
             return jsonify(profile)
 
+        # -----------------------------------------------------
         # GET /api/events
+        # -----------------------------------------------------
+
         if path_parts == ["api", "events"]:
             return jsonify(
                 retrieve_events_api()
             )
 
+        # -----------------------------------------------------
         # GET /api/events/{event_id}/attendees
+        # -----------------------------------------------------
+
         if (
             len(path_parts) == 4
             and path_parts[0] == "api"
             and path_parts[1] == "events"
             and path_parts[3] == "attendees"
         ):
+            event_id = path_parts[2]
+
+            if not retrieve_event_api(event_id):
+                return jsonify({
+                    "error": "Event not found"
+                }), 404
+
             return jsonify(
-                retrieve_attendees_api(
-                    path_parts[2]
-                )
+                retrieve_attendees_api(event_id)
             )
 
+        # -----------------------------------------------------
         # GET /api/events/{event_id}
+        # -----------------------------------------------------
+
         if (
             len(path_parts) == 3
             and path_parts[:2] == ["api", "events"]
@@ -1088,51 +1087,97 @@ def api(request):
 
             return jsonify(event)
 
+        # -----------------------------------------------------
         # GET /api/interests
+        # -----------------------------------------------------
+
         if path_parts == ["api", "interests"]:
             return jsonify(
                 retrieve_interests_api()
             )
 
+        # -----------------------------------------------------
         # GET /api/connections
+        #
+        # Return only the authenticated user's connections.
+        # -----------------------------------------------------
+
         if path_parts == ["api", "connections"]:
             return jsonify(
-                retrieve_connections_api()
+                retrieve_connections_api(
+                    authenticated_user_id
+                )
             )
 
+        # -----------------------------------------------------
         # GET /api/users/{user_id}/connections
+        # -----------------------------------------------------
+
         if (
             len(path_parts) == 4
             and path_parts[0] == "api"
             and path_parts[1] == "users"
             and path_parts[3] == "connections"
         ):
+            requested_user_id = path_parts[2]
+
+            if requested_user_id != authenticated_user_id:
+                return jsonify({
+                    "error": (
+                        "You cannot view another user's "
+                        "connections."
+                    )
+                }), 403
+
             return jsonify(
                 retrieve_connections_api(
-                    path_parts[2]
+                    authenticated_user_id
                 )
             )
 
+        # -----------------------------------------------------
         # GET /api/event_invitations
+        #
+        # Return only invitations received by the current user.
+        # -----------------------------------------------------
+
         if path_parts == ["api", "event_invitations"]:
             return jsonify(
-                retrieve_invitations_api()
+                retrieve_invitations_api(
+                    authenticated_user_id
+                )
             )
 
+        # -----------------------------------------------------
         # GET /api/users/{user_id}/invitations
+        # -----------------------------------------------------
+
         if (
             len(path_parts) == 4
             and path_parts[0] == "api"
             and path_parts[1] == "users"
             and path_parts[3] == "invitations"
         ):
+            requested_user_id = path_parts[2]
+
+            if requested_user_id != authenticated_user_id:
+                return jsonify({
+                    "error": (
+                        "You cannot view another user's "
+                        "invitations."
+                    )
+                }), 403
+
             return jsonify(
                 retrieve_invitations_api(
-                    path_parts[2]
+                    authenticated_user_id
                 )
             )
 
+        # -----------------------------------------------------
         # GET /api/event_attendees
+        # -----------------------------------------------------
+
         if path_parts == ["api", "event_attendees"]:
             return jsonify(
                 retrieve_attendees_api()
@@ -1152,6 +1197,6 @@ def api(request):
 
     except Exception as error:
         return jsonify({
-            "error": "Unable to retrieve Firestore data",
+            "error": "Unable to process request",
             "details": str(error)
         }), 500
