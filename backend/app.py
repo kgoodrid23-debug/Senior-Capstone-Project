@@ -1,5 +1,9 @@
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import requests
 from flask import Flask, jsonify, request, send_file
 
