@@ -6,7 +6,7 @@ import {
 
 async function initializeProtectedPage() {
   try {
-    await waitForAuthenticatedUser();
+    await waitForAuthenticatedUser(); // Checks whether the user has a valid session. If not, it will throw an error and redirect to the login page.
   } catch (error) {
     window.location.replace("login.html");
     return;

@@ -208,3 +208,15 @@ def delete_event_rsvp(event_id, authorization):
         f"/api/events/{safe_id}/rsvp",
         authorization=authorization
     )
+
+def create_connection(
+    recipient_user_id,
+    authorization
+):
+    return _post(
+        "/api/connections",
+        payload={
+            "recipient_user_id": recipient_user_id
+        },
+        authorization=authorization
+    )

@@ -12,6 +12,7 @@ from controllers.data_api_controller import (
     retrieve_invitations,
     retrieve_profiles,
     create_profile,
+    create_connection,
     delete_event_rsvp,
     retrieve_event_rsvp,
     save_event_rsvp
@@ -157,6 +158,41 @@ def connections():
         retrieve_connections
     )
 
+@app.post("/api/connections")
+def create_connection_route():
+    authorization = request.headers.get(
+        "Authorization",
+        ""
+    )
+
+    connection_data = request.get_json(
+        silent=True
+    )
+
+    if not isinstance(connection_data, dict):
+        return jsonify({
+            "error": "A JSON request body is required"
+        }), 400
+
+    recipient_user_id = str(
+        connection_data.get(
+            "recipient_user_id",
+            ""
+        )
+    ).strip()
+
+    if not recipient_user_id:
+        return jsonify({
+            "error": "recipient_user_id is required"
+        }), 400
+
+    return return_data_api_response(
+        lambda: create_connection(
+            recipient_user_id,
+            authorization
+        )
+    )
+
 
 @app.get("/api/users/<user_id>/connections")
 def user_connections(user_id):
@@ -203,7 +239,7 @@ def event_rsvp(event_id):
     return return_data_api_response(
         lambda: retrieve_event_rsvp(
             event_id,
-            authorization
+            authorization # Get the authroization header from the request and pass it to the controller function to verify the user is logged in and has access to the API.
         )
     )
 

@@ -3,6 +3,7 @@ from datetime import date, datetime
 
 import firebase_admin
 import functions_framework
+import hashlib
 from firebase_admin import auth, firestore
 from flask import jsonify
 from google.cloud.firestore_v1.base_query import FieldFilter
@@ -387,8 +388,13 @@ def retrieve_interests_api():
 def map_connection_document(document, current_user_id=None):
     connection = document.to_dict() or {}
 
-    requester_id = connection.get("requester_user_id")
-    recipient_id = connection.get("recipient_user_id")
+    requester_id = connection.get(
+        "requester_user_id"
+    )
+
+    recipient_id = connection.get(
+        "recipient_user_id"
+    )
 
     mapped_connection = {
         "connection_id": connection.get(
@@ -398,9 +404,15 @@ def map_connection_document(document, current_user_id=None):
         "document_id": document.id,
         "requester_user_id": requester_id,
         "recipient_user_id": recipient_id,
-        "status": connection.get("status", "pending"),
+        "status": connection.get(
+            "status",
+            "pending"
+        ),
         "created_at": make_json_safe(
             connection.get("created_at")
+        ),
+        "updated_at": make_json_safe(
+            connection.get("updated_at")
         )
     }
 
@@ -410,7 +422,10 @@ def map_connection_document(document, current_user_id=None):
         else:
             other_user_id = requester_id
 
-        mapped_connection["other_user_id"] = other_user_id
+        mapped_connection["other_user_id"] = (
+            other_user_id
+        )
+
         mapped_connection["other_user"] = (
             retrieve_profile_api(other_user_id)
             if other_user_id
@@ -418,7 +433,6 @@ def map_connection_document(document, current_user_id=None):
         )
 
     return mapped_connection
-
 
 def retrieve_connections_api(user_id=None):
     if not user_id:
@@ -473,6 +487,93 @@ def retrieve_connections_api(user_id=None):
 
     return connections
 
+def build_connection_document_id(
+    first_user_id,
+    second_user_id
+):
+    """
+    Produce one deterministic document ID for two users.
+
+    This prevents A -> B and B -> A from becoming
+    separate connection records.
+    """
+
+    user_ids = sorted([
+        str(first_user_id),
+        str(second_user_id)
+    ])
+
+    pair_value = (
+        f"{user_ids[0]}::{user_ids[1]}"
+    )
+
+    return hashlib.sha256(
+        pair_value.encode("utf-8")
+    ).hexdigest()
+
+
+def create_connection_api(
+    requester_user_id,
+    recipient_user_id
+):
+    if requester_user_id == recipient_user_id:
+        raise ValueError(
+            "You cannot connect with yourself."
+        )
+
+    document_id = build_connection_document_id(
+        requester_user_id,
+        recipient_user_id
+    )
+
+    document_reference = (
+        db.collection("connections")
+        .document(document_id)
+    )
+
+    existing_document = document_reference.get()
+
+    if existing_document.exists:
+        existing_data = (
+            existing_document.to_dict()
+            or {}
+        )
+
+        existing_status = existing_data.get(
+            "status",
+            "pending"
+        )
+
+        if existing_status in {
+            "pending",
+            "accepted"
+        }:
+            return (
+                map_connection_document(
+                    existing_document,
+                    requester_user_id
+                ),
+                False
+            )
+
+    document_reference.set({
+        "connection_id": document_id,
+        "requester_user_id": requester_user_id,
+        "recipient_user_id": recipient_user_id,
+        "status": "pending",
+        "created_at": firestore.SERVER_TIMESTAMP,
+        "updated_at": firestore.SERVER_TIMESTAMP
+    })
+
+    saved_document = document_reference.get()
+
+    return (
+        map_connection_document(
+            saved_document,
+            requester_user_id
+        ),
+        True
+    )
 
 # ---------------------------------------------------------
 # Event invitations
@@ -707,7 +808,7 @@ def api(request):
 
 
     try:
-                # POST /api/profiles
+        # POST /api/profiles
         if (
             request.method == "POST"
             and path_parts == ["api", "profiles"]
@@ -740,7 +841,89 @@ def api(request):
 
             return jsonify(profile), status_code
 
-                # GET, PUT, or DELETE /api/events/{event_id}/rsvp
+        # POST /api/connections
+        if (
+            request.method == "POST"
+            and path_parts == ["api", "connections"]
+        ):
+            authenticated_user = get_authenticated_user(
+                request
+            )
+
+            requester_user_id = authenticated_user["uid"]
+
+            request_data = request.get_json(
+                silent=True
+            )
+
+            if not isinstance(request_data, dict):
+                return jsonify({
+                    "error": (
+                        "A JSON request body is required"
+                    )
+                }), 400
+
+            recipient_user_id = str(
+                request_data.get(
+                    "recipient_user_id",
+                    ""
+                )
+            ).strip()
+
+            if not recipient_user_id:
+                return jsonify({
+                    "error": (
+                        "recipient_user_id is required"
+                    )
+                }), 400
+
+            if requester_user_id == recipient_user_id:
+                return jsonify({
+                    "error": (
+                        "You cannot connect with yourself."
+                    )
+                }), 400
+
+            requester_profile = retrieve_profile_api(
+                requester_user_id
+            )
+
+            if not requester_profile:
+                return jsonify({
+                    "error": (
+                        "Profile not found for "
+                        "authenticated user"
+                    )
+                }), 404
+
+            recipient_profile = retrieve_profile_api(
+                recipient_user_id
+            )
+
+            if not recipient_profile:
+                return jsonify({
+                    "error": "Recipient profile not found"
+                }), 404
+
+            try:
+                connection, was_created = (
+                    create_connection_api(
+                        requester_user_id,
+                        recipient_user_id
+                    )
+                )
+            except ValueError as error:
+                return jsonify({
+                    "error": str(error)
+                }), 400
+
+            status_code = (
+                201 if was_created else 200
+            )
+
+            return jsonify(connection), status_code
+
+        # GET, PUT, or DELETE /api/events/{event_id}/rsvp
         if (
             len(path_parts) == 4
             and path_parts[0] == "api"
@@ -822,7 +1005,7 @@ def api(request):
                 "method": request.method
             }), 405
 
-        # Reject unsupported HTTP methods after checking writes.
+        # Reject other unsupported HTTP methods.
         if request.method != "GET":
             return jsonify({
                 "error": "Method not allowed",
