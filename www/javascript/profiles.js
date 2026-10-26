@@ -1,10 +1,14 @@
+import {
+  authenticatedFetch
+} from "./firebase-auth.js";
+
 document.addEventListener("DOMContentLoaded", loadProfilePage);
 
 async function loadProfilePage() {
   const eventsGrid = document.getElementById("profileEventsGrid");
 
   try {
-    const response = await fetch(getDashboardUrl(), {
+    const response = await authenticatedFetch(getDashboardUrl(), {
       headers: {
         Accept: "application/json"
       }

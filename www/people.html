@@ -54,7 +54,16 @@
       <p class="directory-empty" id="emptyMessage" hidden>No people found.</p>
     </section>
   </main>
-  <script src="javascript/data.js"></script>
-  <script src="directory.js"></script>
+  <script src="javascript/config.js"></script>
+
+  <script
+    type="module"
+    src="javascript/people.js"
+  ></script>
+
+  <script
+    type="module"
+    src="javascript/protected-page.js" // Checks if the current user has a logged in session
+  ></script>
 </body>
 </html>
