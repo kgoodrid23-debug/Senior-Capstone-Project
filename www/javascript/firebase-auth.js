@@ -73,7 +73,7 @@ export function waitForAuthenticatedUser() {
   });
 }
 
-export async function authenticatedFetch(url, options = {}) {
+export async function authenticatedFetch(url, options = {}) { // Gets the users temporary firebase token and sends it with the request to the API. This is used to verify the user is logged in and has access to the API.
   const user = await waitForAuthenticatedUser();
   const token = await user.getIdToken(); // Gets the users firebase token which is used to verify the user is logged in and has access to the API. This token is sent with every request to the API.
 

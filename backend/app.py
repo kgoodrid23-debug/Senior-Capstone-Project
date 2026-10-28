@@ -2,29 +2,32 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv()
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = BASE_DIR / "www"
+
+# Load DATA_API_BASE_URL before importing the controllers.
+load_dotenv(BASE_DIR / ".env")
+
 
 import requests
 from flask import Flask, jsonify, request, send_file
 
 from controllers.data_api_controller import (
+    create_connection,
+    create_profile,
+    delete_event_rsvp,
     retrieve_attendees,
     retrieve_connections,
     retrieve_dashboard,
+    retrieve_event_rsvp,
     retrieve_events,
     retrieve_interests,
     retrieve_invitations,
     retrieve_profiles,
-    create_profile,
-    create_connection,
-    delete_event_rsvp,
-    retrieve_event_rsvp,
-    save_event_rsvp
-    )
+    save_event_rsvp,
+)
 
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-FRONTEND_DIR = BASE_DIR / "www"
 
 app = Flask(
     __name__,
@@ -33,13 +36,32 @@ app = Flask(
 )
 
 
+# ---------------------------------------------------------
+# Shared helpers
+# ---------------------------------------------------------
+
+def get_authorization_header():
+    """
+    Read the Firebase ID token sent by authenticatedFetch().
+
+    The header is forwarded through the controller to the
+    deployed data API, where main.py verifies the token.
+    """
+    return request.headers.get(
+        "Authorization",
+        ""
+    )
+
+
 def return_data_api_response(controller_call):
     """
-    Run a controller function and preserve the status code returned
-    by the Firestore data API.
+    Run a controller function and preserve the status code
+    returned by the deployed Firestore data API.
     """
+
     try:
         payload, status_code = controller_call()
+
         return jsonify(payload), status_code
 
     except requests.RequestException as error:
@@ -54,9 +76,15 @@ def return_data_api_response(controller_call):
         }), 500
 
 
+# ---------------------------------------------------------
+# Frontend
+# ---------------------------------------------------------
+
 @app.get("/")
 def home():
-    return send_file(FRONTEND_DIR / "login.html")
+    return send_file(
+        FRONTEND_DIR / "login.html"
+    )
 
 
 # ---------------------------------------------------------
@@ -65,13 +93,12 @@ def home():
 
 @app.get("/api/dashboard")
 def dashboard():
-    authorization = request.headers.get(
-        "Authorization",
-        ""
-    )
+    authorization = get_authorization_header()
 
     return return_data_api_response(
-        lambda: retrieve_dashboard(authorization)
+        lambda: retrieve_dashboard(
+            authorization=authorization
+        )
     )
 
 
@@ -81,23 +108,30 @@ def dashboard():
 
 @app.get("/api/profiles")
 def profiles():
+    authorization = get_authorization_header()
+
     return return_data_api_response(
-        retrieve_profiles
+        lambda: retrieve_profiles(
+            authorization=authorization
+        )
     )
 
 
 @app.get("/api/profiles/<user_id>")
 def profile_by_id(user_id):
+    authorization = get_authorization_header()
+
     return return_data_api_response(
-        lambda: retrieve_profiles(user_id)
+        lambda: retrieve_profiles(
+            user_id=user_id,
+            authorization=authorization
+        )
     )
+
 
 @app.post("/api/profiles")
 def create_profile_route():
-    authorization = request.headers.get(
-        "Authorization",
-        ""
-    )
+    authorization = get_authorization_header()
 
     profile_data = request.get_json(
         silent=True
@@ -122,22 +156,36 @@ def create_profile_route():
 
 @app.get("/api/events")
 def events():
+    authorization = get_authorization_header()
+
     return return_data_api_response(
-        retrieve_events
+        lambda: retrieve_events(
+            authorization=authorization
+        )
     )
 
 
 @app.get("/api/events/<event_id>")
 def event_by_id(event_id):
+    authorization = get_authorization_header()
+
     return return_data_api_response(
-        lambda: retrieve_events(event_id)
+        lambda: retrieve_events(
+            event_id=event_id,
+            authorization=authorization
+        )
     )
 
 
 @app.get("/api/events/<event_id>/attendees")
 def event_attendees(event_id):
+    authorization = get_authorization_header()
+
     return return_data_api_response(
-        lambda: retrieve_attendees(event_id)
+        lambda: retrieve_attendees(
+            event_id=event_id,
+            authorization=authorization
+        )
     )
 
 
@@ -147,8 +195,12 @@ def event_attendees(event_id):
 
 @app.get("/api/interests")
 def interests():
+    authorization = get_authorization_header()
+
     return return_data_api_response(
-        retrieve_interests
+        lambda: retrieve_interests(
+            authorization=authorization
+        )
     )
 
 
@@ -158,16 +210,18 @@ def interests():
 
 @app.get("/api/connections")
 def connections():
+    authorization = get_authorization_header()
+
     return return_data_api_response(
-        retrieve_connections
+        lambda: retrieve_connections(
+            authorization=authorization
+        )
     )
+
 
 @app.post("/api/connections")
 def create_connection_route():
-    authorization = request.headers.get(
-        "Authorization",
-        ""
-    )
+    authorization = get_authorization_header()
 
     connection_data = request.get_json(
         silent=True
@@ -200,8 +254,13 @@ def create_connection_route():
 
 @app.get("/api/users/<user_id>/connections")
 def user_connections(user_id):
+    authorization = get_authorization_header()
+
     return return_data_api_response(
-        lambda: retrieve_connections(user_id)
+        lambda: retrieve_connections(
+            user_id=user_id,
+            authorization=authorization
+        )
     )
 
 
@@ -211,60 +270,76 @@ def user_connections(user_id):
 
 @app.get("/api/event_invitations")
 def event_invitations():
+    authorization = get_authorization_header()
+
     return return_data_api_response(
-        retrieve_invitations
+        lambda: retrieve_invitations(
+            authorization=authorization
+        )
     )
 
 
 @app.get("/api/users/<user_id>/invitations")
 def user_invitations(user_id):
+    authorization = get_authorization_header()
+
     return return_data_api_response(
-        lambda: retrieve_invitations(user_id)
+        lambda: retrieve_invitations(
+            user_id=user_id,
+            authorization=authorization
+        )
     )
 
 
 # ---------------------------------------------------------
-# All attendance records
+# Attendance records
 # ---------------------------------------------------------
 
 @app.get("/api/event_attendees")
 def all_event_attendees():
+    authorization = get_authorization_header()
+
     return return_data_api_response(
-        retrieve_attendees
+        lambda: retrieve_attendees(
+            authorization=authorization
+        )
     )
+
+
+# ---------------------------------------------------------
+# RSVP
+# ---------------------------------------------------------
 
 @app.get("/api/events/<event_id>/rsvp")
 def event_rsvp(event_id):
-    authorization = request.headers.get(
-        "Authorization",
-        ""
-    )
+    authorization = get_authorization_header()
 
     return return_data_api_response(
         lambda: retrieve_event_rsvp(
             event_id,
-            authorization # Get the authroization header from the request and pass it to the controller function to verify the user is logged in and has access to the API.
+            authorization
         )
     )
 
 
 @app.put("/api/events/<event_id>/rsvp")
 def save_rsvp(event_id):
-    authorization = request.headers.get(
-        "Authorization",
-        ""
-    )
+    authorization = get_authorization_header()
 
-    rsvp_data = request.get_json(
-        silent=True
-    ) or {}
+    rsvp_data = (
+        request.get_json(silent=True)
+        or {}
+    )
 
     if not isinstance(rsvp_data, dict):
         return jsonify({
             "error": "A JSON request body is required"
         }), 400
 
-    status = rsvp_data.get("status", "going")
+    status = rsvp_data.get(
+        "status",
+        "going"
+    )
 
     return return_data_api_response(
         lambda: save_event_rsvp(
@@ -277,10 +352,7 @@ def save_rsvp(event_id):
 
 @app.delete("/api/events/<event_id>/rsvp")
 def cancel_rsvp(event_id):
-    authorization = request.headers.get(
-        "Authorization",
-        ""
-    )
+    authorization = get_authorization_header()
 
     return return_data_api_response(
         lambda: delete_event_rsvp(

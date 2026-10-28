@@ -10,7 +10,18 @@ DATA_API_BASE_URL = os.getenv(
 ).rstrip("/")
 
 
-def _get(endpoint, params=None, authorization=None):
+# ---------------------------------------------------------
+# Shared HTTP methods
+# ---------------------------------------------------------
+
+def _build_headers(authorization=None):
+    """
+    Build the headers sent to the deployed data API.
+
+    The authorization value already contains:
+    Bearer FIREBASE_ID_TOKEN
+    """
+
     headers = {
         "Accept": "application/json"
     }
@@ -18,15 +29,18 @@ def _get(endpoint, params=None, authorization=None):
     if authorization:
         headers["Authorization"] = authorization
 
-    response = requests.get(
-        f"{DATA_API_BASE_URL}{endpoint}",
-        params=params,
-        headers=headers,
-        timeout=10
-    )
+    return headers
+
+
+def _parse_response(response):
+    """
+    Convert the data API response to JSON and preserve its
+    original HTTP status code.
+    """
 
     try:
         payload = response.json()
+
     except ValueError as error:
         raise RuntimeError(
             "The data API returned an invalid JSON response."
@@ -34,86 +48,68 @@ def _get(endpoint, params=None, authorization=None):
 
     return payload, response.status_code
 
+
+def _get(
+    endpoint,
+    params=None,
+    authorization=None
+):
+    response = requests.get(
+        f"{DATA_API_BASE_URL}{endpoint}",
+        params=params,
+        headers=_build_headers(authorization),
+        timeout=10
+    )
+
+    return _parse_response(response)
+
+
 def _post(
     endpoint,
     payload=None,
     authorization=None
 ):
-    headers = {
-        "Accept": "application/json"
-    }
-
-    if authorization:
-        headers["Authorization"] = authorization
-
     response = requests.post(
         f"{DATA_API_BASE_URL}{endpoint}",
         json=payload,
-        headers=headers,
+        headers=_build_headers(authorization),
         timeout=10
     )
 
-    try:
-        response_payload = response.json()
-    except ValueError as error:
-        raise RuntimeError(
-            "The data API returned an invalid JSON response."
-        ) from error
+    return _parse_response(response)
 
-    return response_payload, response.status_code
 
 def _put(
     endpoint,
     payload=None,
     authorization=None
 ):
-    headers = {
-        "Accept": "application/json"
-    }
-
-    if authorization:
-        headers["Authorization"] = authorization
-
     response = requests.put(
         f"{DATA_API_BASE_URL}{endpoint}",
         json=payload,
-        headers=headers,
+        headers=_build_headers(authorization),
         timeout=10
     )
 
-    try:
-        response_payload = response.json()
-    except ValueError as error:
-        raise RuntimeError(
-            "The data API returned an invalid JSON response."
-        ) from error
-
-    return response_payload, response.status_code
+    return _parse_response(response)
 
 
-def _delete(endpoint, authorization=None):
-    headers = {
-        "Accept": "application/json"
-    }
-
-    if authorization:
-        headers["Authorization"] = authorization
-
+def _delete(
+    endpoint,
+    authorization=None
+):
     response = requests.delete(
         f"{DATA_API_BASE_URL}{endpoint}",
-        headers=headers,
+        headers=_build_headers(authorization),
         timeout=10
     )
 
-    try:
-        response_payload = response.json()
-    except ValueError as error:
-        raise RuntimeError(
-            "The data API returned an invalid JSON response."
-        ) from error
+    return _parse_response(response)
 
-    return response_payload, response.status_code
 
+# ---------------------------------------------------------
+# Dashboard
+# ---------------------------------------------------------
 
 def retrieve_dashboard(authorization=None):
     return _get(
@@ -122,64 +118,178 @@ def retrieve_dashboard(authorization=None):
     )
 
 
-def retrieve_profiles(user_id=None):
+# ---------------------------------------------------------
+# Profiles
+# ---------------------------------------------------------
+
+def retrieve_profiles(
+    user_id=None,
+    authorization=None
+):
     if user_id:
-        safe_id = quote(str(user_id), safe="")
-        return _get(f"/api/profiles/{safe_id}")
-
-    return _get("/api/profiles")
-
-
-def retrieve_events(event_id=None):
-    if event_id:
-        safe_id = quote(str(event_id), safe="")
-        return _get(f"/api/events/{safe_id}")
-
-    return _get("/api/events")
-
-
-def retrieve_interests():
-    return _get("/api/interests")
-
-
-def retrieve_connections(user_id=None):
-    if user_id:
-        safe_id = quote(str(user_id), safe="")
-        return _get(
-            f"/api/users/{safe_id}/connections"
+        safe_id = quote(
+            str(user_id),
+            safe=""
         )
 
-    return _get("/api/connections")
-
-
-def retrieve_invitations(user_id=None):
-    if user_id:
-        safe_id = quote(str(user_id), safe="")
         return _get(
-            f"/api/users/{safe_id}/invitations"
+            f"/api/profiles/{safe_id}",
+            authorization=authorization
         )
 
-    return _get("/api/event_invitations")
+    return _get(
+        "/api/profiles",
+        authorization=authorization
+    )
 
 
-def retrieve_attendees(event_id=None):
-    if event_id:
-        safe_id = quote(str(event_id), safe="")
-        return _get(
-            f"/api/events/{safe_id}/attendees"
-        )
-
-    return _get("/api/event_attendees")
-
-def create_profile(profile_data, authorization):
+def create_profile(
+    profile_data,
+    authorization
+):
     return _post(
         "/api/profiles",
         payload=profile_data,
         authorization=authorization
     )
 
-def retrieve_event_rsvp(event_id, authorization):
-    safe_id = quote(str(event_id), safe="")
+
+# ---------------------------------------------------------
+# Events
+# ---------------------------------------------------------
+
+def retrieve_events(
+    event_id=None,
+    authorization=None
+):
+    if event_id:
+        safe_id = quote(
+            str(event_id),
+            safe=""
+        )
+
+        return _get(
+            f"/api/events/{safe_id}",
+            authorization=authorization
+        )
+
+    return _get(
+        "/api/events",
+        authorization=authorization
+    )
+
+
+# ---------------------------------------------------------
+# Interests
+# ---------------------------------------------------------
+
+def retrieve_interests(authorization=None):
+    return _get(
+        "/api/interests",
+        authorization=authorization
+    )
+
+
+# ---------------------------------------------------------
+# Connections
+# ---------------------------------------------------------
+
+def retrieve_connections(
+    user_id=None,
+    authorization=None
+):
+    if user_id:
+        safe_id = quote(
+            str(user_id),
+            safe=""
+        )
+
+        return _get(
+            f"/api/users/{safe_id}/connections",
+            authorization=authorization
+        )
+
+    return _get(
+        "/api/connections",
+        authorization=authorization
+    )
+
+
+def create_connection(
+    recipient_user_id,
+    authorization
+):
+    return _post(
+        "/api/connections",
+        payload={
+            "recipient_user_id": recipient_user_id
+        },
+        authorization=authorization
+    )
+
+
+# ---------------------------------------------------------
+# Invitations
+# ---------------------------------------------------------
+
+def retrieve_invitations(
+    user_id=None,
+    authorization=None
+):
+    if user_id:
+        safe_id = quote(
+            str(user_id),
+            safe=""
+        )
+
+        return _get(
+            f"/api/users/{safe_id}/invitations",
+            authorization=authorization
+        )
+
+    return _get(
+        "/api/event_invitations",
+        authorization=authorization
+    )
+
+
+# ---------------------------------------------------------
+# Event attendees
+# ---------------------------------------------------------
+
+def retrieve_attendees(
+    event_id=None,
+    authorization=None
+):
+    if event_id:
+        safe_id = quote(
+            str(event_id),
+            safe=""
+        )
+
+        return _get(
+            f"/api/events/{safe_id}/attendees",
+            authorization=authorization
+        )
+
+    return _get(
+        "/api/event_attendees",
+        authorization=authorization
+    )
+
+
+# ---------------------------------------------------------
+# Event RSVP
+# ---------------------------------------------------------
+
+def retrieve_event_rsvp(
+    event_id,
+    authorization
+):
+    safe_id = quote(
+        str(event_id),
+        safe=""
+    )
 
     return _get(
         f"/api/events/{safe_id}/rsvp",
@@ -192,31 +302,30 @@ def save_event_rsvp(
     status,
     authorization
 ):
-    safe_id = quote(str(event_id), safe="")
+    safe_id = quote(
+        str(event_id),
+        safe=""
+    )
 
     return _put(
         f"/api/events/{safe_id}/rsvp",
-        payload={"status": status},
+        payload={
+            "status": status
+        },
         authorization=authorization
     )
 
 
-def delete_event_rsvp(event_id, authorization):
-    safe_id = quote(str(event_id), safe="")
+def delete_event_rsvp(
+    event_id,
+    authorization
+):
+    safe_id = quote(
+        str(event_id),
+        safe=""
+    )
 
     return _delete(
         f"/api/events/{safe_id}/rsvp",
-        authorization=authorization
-    )
-
-def create_connection(
-    recipient_user_id,
-    authorization
-):
-    return _post(
-        "/api/connections",
-        payload={
-            "recipient_user_id": recipient_user_id
-        },
         authorization=authorization
     )
