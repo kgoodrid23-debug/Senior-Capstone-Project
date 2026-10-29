@@ -25,6 +25,7 @@ from controllers.data_api_controller import (
     retrieve_interests,
     retrieve_invitations,
     retrieve_profiles,
+    update_connection,
     save_event_rsvp,
 )
 
@@ -188,6 +189,37 @@ def event_attendees(event_id):
         )
     )
 
+@app.put("/api/connections/<connection_id>")
+def update_connection_route(connection_id):
+    authorization = get_authorization_header()
+
+    connection_data = request.get_json(
+        silent=True
+    )
+
+    if not isinstance(connection_data, dict):
+        return jsonify({
+            "error": "A JSON request body is required"
+        }), 400
+
+    status = str(
+        connection_data.get("status", "")
+    ).strip().lower()
+
+    if status not in {"accepted", "declined"}:
+        return jsonify({
+            "error": (
+                "status must be accepted or declined"
+            )
+        }), 400
+
+    return return_data_api_response(
+        lambda: update_connection(
+            connection_id,
+            status,
+            authorization
+        )
+    )
 
 # ---------------------------------------------------------
 # Interests

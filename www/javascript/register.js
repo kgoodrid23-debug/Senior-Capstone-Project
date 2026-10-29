@@ -34,6 +34,9 @@ const registerError =
 const registerButton =
   document.getElementById("registerButton");
 
+const profilePhotoUrlInput =
+  document.getElementById("profilePhotoUrl");
+
 
 registerForm.addEventListener(
   "submit",
@@ -74,7 +77,8 @@ registerForm.addEventListener(
             first_name: firstNameInput.value.trim(),
             last_name: lastNameInput.value.trim(),
             date_of_birth: dateOfBirthInput.value,
-            location: locationInput.value.trim()
+            location: locationInput.value.trim(),
+            profile_photo_url: profilePhotoUrlInput.value.trim()
           })
         }
       );

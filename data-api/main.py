@@ -575,6 +575,84 @@ def create_connection_api(
         True
     )
 
+
+ALLOWED_CONNECTION_RESPONSE_STATUSES = {
+    "accepted",
+    "declined"
+}
+
+
+def update_connection_api(
+    connection_id,
+    authenticated_user_id,
+    status
+):
+    """
+    Accept or decline a pending connection request.
+
+    Only the recipient of the request may change its status.
+    """
+
+    normalized_status = str(status).strip().lower()
+
+    if (
+        normalized_status
+        not in ALLOWED_CONNECTION_RESPONSE_STATUSES
+    ):
+        raise ValueError(
+            "Connection status must be accepted or declined."
+        )
+
+    document_reference = (
+        db.collection("connections")
+        .document(str(connection_id))
+    )
+
+    document = document_reference.get()
+
+    if not document.exists:
+        return None
+
+    connection_data = document.to_dict() or {}
+
+    recipient_user_id = connection_data.get(
+        "recipient_user_id"
+    )
+
+    if recipient_user_id != authenticated_user_id:
+        raise PermissionError(
+            "Only the recipient can accept or decline "
+            "this connection request."
+        )
+
+    current_status = connection_data.get(
+        "status",
+        "pending"
+    )
+
+    # Returning the existing result makes repeated clicks safe.
+    if current_status == normalized_status:
+        return map_connection_document(
+            document,
+            authenticated_user_id
+        )
+
+    if current_status != "pending":
+        raise ValueError(
+            "Only pending connection requests can be updated."
+        )
+
+    document_reference.update({
+        "status": normalized_status,
+        "updated_at": firestore.SERVER_TIMESTAMP
+    })
+
+    updated_document = document_reference.get()
+
+    return map_connection_document(
+        updated_document,
+        authenticated_user_id
+    )
 # ---------------------------------------------------------
 # Event invitations
 # ---------------------------------------------------------
@@ -900,6 +978,54 @@ def api(request):
 
             status_code = 201 if was_created else 200
             return jsonify(connection), status_code
+
+                # -----------------------------------------------------
+        # PUT /api/connections/{connection_id}
+        # -----------------------------------------------------
+
+        if (
+            request.method == "PUT"
+            and len(path_parts) == 3
+            and path_parts[:2] == ["api", "connections"]
+        ):
+                connection_id = path_parts[2]
+
+                request_data = request.get_json(
+                    silent=True
+                )
+
+                if not isinstance(request_data, dict):
+                    return jsonify({
+                        "error": "A JSON request body is required"
+                    }), 400
+
+                status = str(
+                    request_data.get("status", "")
+                ).strip().lower()
+
+                try:
+                    connection = update_connection_api(
+                        connection_id,
+                        authenticated_user_id,
+                        status
+                    )
+
+                except PermissionError as error:
+                    return jsonify({
+                        "error": str(error)
+                    }), 403
+
+                except ValueError as error:
+                    return jsonify({
+                        "error": str(error)
+                    }), 400
+
+                if not connection:
+                    return jsonify({
+                        "error": "Connection request not found"
+                    }), 404
+
+                return jsonify(connection), 200
 
         # -----------------------------------------------------
         # GET, PUT, DELETE /api/events/{event_id}/rsvp

@@ -293,16 +293,26 @@ function createProfileCard(profile) {
 
 
 function createConnectionButton(profile) {
+  const connection = findConnection(
+    profile.user_id
+  );
+
+  const isReceivedPendingRequest =
+    connection?.status === "pending" &&
+    connection.recipient_user_id === currentUserId;
+
+  if (isReceivedPendingRequest) {
+    return createConnectionResponseButtons(
+      connection
+    );
+  }
+
   const button = document.createElement("button");
 
   button.className =
     "btn btn--primary connection-button";
 
   button.type = "button";
-
-  const connection = findConnection(
-    profile.user_id
-  );
 
   updateConnectionButton(
     button,
@@ -322,6 +332,131 @@ function createConnectionButton(profile) {
   }
 
   return button;
+}
+
+function createConnectionResponseButtons(connection) {
+  const actions = document.createElement("div");
+
+  actions.className = "connection-actions";
+
+  const acceptButton =
+    document.createElement("button");
+
+  acceptButton.className =
+    "btn btn--primary connection-button";
+
+  acceptButton.type = "button";
+  acceptButton.textContent = "Accept";
+
+  const declineButton =
+    document.createElement("button");
+
+  declineButton.className =
+    "btn btn--secondary connection-button";
+
+  declineButton.type = "button";
+  declineButton.textContent = "Decline";
+
+  acceptButton.addEventListener(
+    "click",
+    async () => {
+      await respondToConnectionRequest(
+        connection,
+        "accepted",
+        actions
+      );
+    }
+  );
+
+  declineButton.addEventListener(
+    "click",
+    async () => {
+      await respondToConnectionRequest(
+        connection,
+        "declined",
+        actions
+      );
+    }
+  );
+
+  actions.append(
+    acceptButton,
+    declineButton
+  );
+
+  return actions;
+}
+
+
+async function respondToConnectionRequest(
+  connection,
+  status,
+  actions
+) {
+  const connectionId =
+    connection.connection_id ||
+    connection.document_id;
+
+  if (!connectionId) {
+    alert("Connection ID is unavailable.");
+    return;
+  }
+
+  const buttons =
+    actions.querySelectorAll("button");
+
+  buttons.forEach((button) => {
+    button.disabled = true;
+  });
+
+  try {
+    const response = await authenticatedFetch(
+      getApiUrl(
+        `/api/connections/${encodeURIComponent(
+          connectionId
+        )}`
+      ),
+      {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          status
+        })
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        result.error ||
+        `HTTP ${response.status}`
+      );
+    }
+
+    replaceOrAddConnection(result);
+
+    // Rebuild the cards with their new connection states.
+    renderFilteredProfiles();
+
+  } catch (error) {
+    console.error(
+      "Unable to update connection request:",
+      error
+    );
+
+    buttons.forEach((button) => {
+      button.disabled = false;
+    });
+
+    alert(
+      error.message ||
+      "Unable to update the connection request."
+    );
+  }
 }
 
 

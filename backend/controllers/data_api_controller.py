@@ -227,6 +227,24 @@ def create_connection(
         authorization=authorization
     )
 
+def update_connection(
+    connection_id,
+    status,
+    authorization
+):
+    safe_id = quote(
+        str(connection_id),
+        safe=""
+    )
+
+    return _put(
+        f"/api/connections/{safe_id}",
+        payload={
+            "status": status
+        },
+        authorization=authorization
+    )
+
 
 # ---------------------------------------------------------
 # Invitations
