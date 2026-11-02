@@ -81,9 +81,11 @@ def dashboard():
 
 @app.get("/api/profiles")
 def profiles():
+    authorization = request.headers.get("Authorization", "")
     return return_data_api_response(
-        retrieve_profiles
+        lambda: retrieve_profiles(authorization=authorization)
     )
+
 
 
 @app.get("/api/profiles/<user_id>")
@@ -200,10 +202,13 @@ def create_connection_route():
 
 @app.get("/api/users/<user_id>/connections")
 def user_connections(user_id):
+    authorization = request.headers.get("Authorization", "")
     return return_data_api_response(
-        lambda: retrieve_connections(user_id)
+        lambda: retrieve_connections(
+            user_id,
+            authorization=authorization
+        )
     )
-
 
 # ---------------------------------------------------------
 # Invitations

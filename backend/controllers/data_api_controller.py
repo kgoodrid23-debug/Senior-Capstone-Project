@@ -122,13 +122,18 @@ def retrieve_dashboard(authorization=None):
     )
 
 
-def retrieve_profiles(user_id=None):
+def retrieve_profiles(user_id=None, authorization=None):
     if user_id:
         safe_id = quote(str(user_id), safe="")
-        return _get(f"/api/profiles/{safe_id}")
+        return _get(
+            f"/api/profiles/{safe_id}",
+            authorization=authorization
+        )
 
-    return _get("/api/profiles")
-
+    return _get(
+        "/api/profiles",
+        authorization=authorization
+    )
 
 def retrieve_events(event_id=None):
     if event_id:
@@ -142,14 +147,19 @@ def retrieve_interests():
     return _get("/api/interests")
 
 
-def retrieve_connections(user_id=None):
+
+def retrieve_connections(user_id=None, authorization=None):
     if user_id:
         safe_id = quote(str(user_id), safe="")
         return _get(
-            f"/api/users/{safe_id}/connections"
+            f"/api/users/{safe_id}/connections",
+            authorization=authorization
         )
 
-    return _get("/api/connections")
+    return _get(
+        "/api/connections",
+        authorization=authorization
+    )
 
 
 def retrieve_invitations(user_id=None):
