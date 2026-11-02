@@ -131,15 +131,18 @@ def events():
 
 @app.get("/api/events/<event_id>")
 def event_by_id(event_id):
-    return return_data_api_response(
-        lambda: retrieve_events(event_id)
-    )
+    authorization = request.headers.get("Authorization", "")
 
+    return return_data_api_response(
+        lambda: retrieve_events(event_id, authorization)
+    )
 
 @app.get("/api/events/<event_id>/attendees")
 def event_attendees(event_id):
+    authorization = request.headers.get("Authorization", "")
+
     return return_data_api_response(
-        lambda: retrieve_attendees(event_id)
+        lambda: retrieve_attendees(event_id, authorization)
     )
 
 

@@ -1,3 +1,4 @@
+
 import {
   authenticatedFetch
 } from "./firebase-auth.js";
@@ -180,6 +181,16 @@ function renderEvents(events, eventsGridEl) {
     card.className =
       "event-card home-event-card";
 
+    // Enable navigation to the event description page
+    const eventId =
+      event.document_id || event.event_id;
+
+    if (eventId) {
+      card.dataset.eventId = String(eventId);
+      card.tabIndex = 0;
+      card.setAttribute("role", "link");
+    }
+
     const image = document.createElement("div");
 
     image.className =
@@ -226,9 +237,6 @@ function renderEvents(events, eventsGridEl) {
     rsvpButton.className = "rsvp-btn";
     rsvpButton.type = "button";
     rsvpButton.textContent = "RSVP";
-
-    const eventId =
-      event.document_id || event.event_id;
 
     if (eventId) {
       configureRsvpButton(
