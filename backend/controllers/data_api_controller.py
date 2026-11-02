@@ -122,34 +122,50 @@ def retrieve_dashboard(authorization=None):
     )
 
 
-def retrieve_profiles(user_id=None):
+def retrieve_profiles(user_id=None, authorization=None):
     if user_id:
         safe_id = quote(str(user_id), safe="")
-        return _get(f"/api/profiles/{safe_id}")
+        return _get(
+            f"/api/profiles/{safe_id}",
+            authorization=authorization
+        )
 
-    return _get("/api/profiles")
+    return _get(
+        "/api/profiles",
+        authorization=authorization
+    )
 
-
-def retrieve_events(event_id=None):
+def retrieve_events(event_id=None, authorization=None):
     if event_id:
         safe_id = quote(str(event_id), safe="")
-        return _get(f"/api/events/{safe_id}")
+        return _get(
+            f"/api/events/{safe_id}",
+            authorization=authorization
+        )
 
-    return _get("/api/events")
+    return _get(
+        "/api/events",
+        authorization=authorization
+    )
 
 
 def retrieve_interests():
     return _get("/api/interests")
 
 
-def retrieve_connections(user_id=None):
+
+def retrieve_connections(user_id=None, authorization=None):
     if user_id:
         safe_id = quote(str(user_id), safe="")
         return _get(
-            f"/api/users/{safe_id}/connections"
+            f"/api/users/{safe_id}/connections",
+            authorization=authorization
         )
 
-    return _get("/api/connections")
+    return _get(
+        "/api/connections",
+        authorization=authorization
+    )
 
 
 def retrieve_invitations(user_id=None):
@@ -162,12 +178,18 @@ def retrieve_invitations(user_id=None):
     return _get("/api/event_invitations")
 
 
-def retrieve_attendees(event_id=None):
+def retrieve_attendees(event_id=None, authorization=None):
     if event_id:
         safe_id = quote(str(event_id), safe="")
         return _get(
-            f"/api/events/{safe_id}/attendees"
+            f"/api/events/{safe_id}/attendees",
+            authorization=authorization
         )
+
+    return _get(
+        "/api/event_attendees",
+        authorization=authorization
+    )
 
     return _get("/api/event_attendees")
 

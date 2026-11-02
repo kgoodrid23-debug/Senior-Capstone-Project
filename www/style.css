@@ -930,3 +930,251 @@
   .site-header .nav-link { padding: 9px 3px; min-width: 0; }
   .hero-actions .action-btn { display: block; text-align: center; }
 }
+
+/* =========================================
+   EVENT DESCRIPTION PAGE
+========================================= */
+
+.event-description-page-body {
+  background: #dfeaf7;
+  color: #1d2247;
+  min-height: 100vh;
+}
+
+.event-description-main {
+  padding-top: 24px;
+  padding-bottom: 60px;
+}
+
+/* Back Navigation */
+
+.event-back-navigation {
+  margin-bottom: 20px;
+}
+
+.event-back-navigation a {
+  color: #2c5fe5;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.event-back-navigation a:hover {
+  text-decoration: underline;
+}
+
+/* Event Hero */
+
+.event-description-hero {
+  background: #fff;
+  border: 1px solid #e4ebf8;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.event-description-banner {
+  height: 300px;
+  background: linear-gradient(
+    120deg,
+    #17245f,
+    #3f55f4 60%,
+    #8295ff
+  );
+  overflow: hidden;
+}
+
+.event-description-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.event-description-banner img[hidden] {
+  display: none;
+}
+
+/* Event Heading */
+
+.event-description-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 30px;
+}
+
+.event-heading-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.event-description-heading h1 {
+  font-size: clamp(30px, 3vw, 44px);
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  color: #1d2a68;
+  margin: 12px 0 16px;
+}
+
+.event-description-heading .event-category {
+  display: inline-block;
+  background: #eef1ff;
+  color: #3f55f4;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.event-description-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+
+.event-description-meta p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #586894;
+  font-size: 15px;
+}
+
+/* RSVP Button */
+
+.event-heading-actions {
+  flex-shrink: 0;
+}
+
+.event-heading-actions .rsvp-btn {
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 6px 16px rgba(63, 85, 244, 0.18);
+}
+
+/* Lower Content Layout */
+
+.event-description-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(290px, 0.9fr);
+  gap: 20px;
+  margin-top: 24px;
+  align-items: start;
+}
+
+.event-about-panel,
+.event-attendees-panel {
+  padding: 24px;
+  min-width: 0;
+}
+
+.event-description-grid .panel-header h2 {
+  font-size: 25px;
+  color: #1d2a68;
+  letter-spacing: -0.5px;
+}
+
+/* Event Description */
+
+.event-about-content {
+  padding-top: 6px;
+}
+
+.event-about-content p {
+  color: #53608b;
+  font-size: 16px;
+  line-height: 1.8;
+  white-space: pre-line;
+}
+
+/* Attendees */
+
+.event-attendees-list {
+  display: grid;
+  gap: 12px;
+}
+
+.event-attendees-list > p {
+  color: #67719a;
+  font-size: 15px;
+}
+
+/* Optional attendee cards for JS rendering */
+
+.event-attendee-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid #e4ebf8;
+  border-radius: 12px;
+  background: #f4f7fd;
+}
+
+.event-attendee-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #e4ebf8;
+  flex-shrink: 0;
+}
+
+.event-attendee-info h3 {
+  color: #1d2a68;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.event-attendee-info p {
+  color: #586894;
+  font-size: 13px;
+}
+
+/* Responsive Layout */
+
+@media (max-width: 900px) {
+  .event-description-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .event-description-banner {
+    height: 240px;
+  }
+}
+
+@media (max-width: 600px) {
+  .event-description-main {
+    padding-top: 16px;
+  }
+
+  .event-description-banner {
+    height: 190px;
+  }
+
+  .event-description-heading {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 20px;
+  }
+
+  .event-description-heading h1 {
+    font-size: 29px;
+  }
+
+  .event-description-meta {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .event-heading-actions .rsvp-btn {
+    width: 100%;
+  }
+
+  .event-about-panel,
+  .event-attendees-panel {
+    padding: 18px;
+  }
+}
