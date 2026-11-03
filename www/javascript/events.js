@@ -26,6 +26,7 @@ async function loadEvents() {
     const events = Array.isArray(data) ? data : data.events;
 
     renderEvents(events, eventsGrid);
+
   } catch (error) {
     console.error("Event load failed:", error);
 
@@ -78,8 +79,19 @@ function renderEvents(events, eventsGrid) {
 function createEventCard(event) {
   const card = document.createElement("article");
   card.className = "event-card";
-  card.dataset.eventId = String(event.event_id || "");
 
+  // Shared event navigation
+  if (event.event_id != null && String(event.event_id) !== "") {
+    card.dataset.eventId = String(event.event_id);
+    card.tabIndex = 0;
+    card.setAttribute("role", "link");
+    card.setAttribute(
+      "aria-label",
+      `View details for ${event.title || "Untitled Event"}`
+    );
+  }
+
+  // Event image
   const image = document.createElement("div");
   image.className = "event-image";
 
@@ -92,18 +104,23 @@ function createEventCard(event) {
     image.classList.add("event-image-placeholder");
   }
 
+  // Event content
   const content = document.createElement("div");
   content.className = "event-content";
 
+  // Date badge
   const dateBadge = createDateBadge(event.start_time);
 
+  // Event title
   const title = document.createElement("h3");
   title.textContent = event.title || "Untitled Event";
 
+  // Event date
   const date = document.createElement("p");
   date.className = "event-meta";
   date.textContent = `📅 ${formatEventDate(event.start_time)}`;
 
+  // Event location
   const location = document.createElement("p");
   location.className = "event-meta";
   location.textContent =
@@ -111,6 +128,7 @@ function createEventCard(event) {
 
   content.append(dateBadge, title, date, location);
 
+  // Event description
   if (event.description) {
     const description = document.createElement("p");
     description.className = "event-description";
@@ -118,6 +136,7 @@ function createEventCard(event) {
     content.appendChild(description);
   }
 
+  // Event category
   if (event.category) {
     const category = document.createElement("span");
     category.className = "event-category";

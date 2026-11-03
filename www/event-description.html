@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#3f55f4" />
+
+  <title>Buddiez &amp; Bandz | Event Description</title>
+
+  <link rel="icon" href="assets/app-icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="event-description-page-body">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="page header-inner">
+
+      <a href="index.html" class="brand">
+        <div class="brand-icon"><span></span></div>
+        <div class="brand-copy">
+          Buddiez &amp; Bandz
+          <small>EVENTS · PEOPLE · REAL CONNECTIONS</small>
+        </div>
+      </a>
+
+      <button class="location-select" type="button">
+        <span>📍</span>
+        <strong>USI / Evansville, IN</strong>
+        <span>⌄</span>
+      </button>
+
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="nav-link" href="index.html">
+          <span class="nav-icon">⌂</span>
+          <span>Home</span>
+        </a>
+
+        <a class="nav-link active" href="events.html">
+          <span class="nav-icon">▣</span>
+          <span>Events</span>
+        </a>
+
+        <a class="nav-link" href="people.html">
+          <span class="nav-icon">♟</span>
+          <span>People</span>
+        </a>
+
+        <a class="nav-link" href="profile.html">
+          <span class="nav-icon">●</span>
+          <span>Profile</span>
+        </a>
+      </nav>
+
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="page event-description-main">
+
+    <!-- Back Navigation -->
+    <div class="event-back-navigation">
+      <a href="events.html">← Back to Events</a>
+    </div>
+
+    <!-- Event Banner -->
+    <section class="event-description-hero">
+
+      <div class="event-description-banner">
+        <img id="eventImage" alt="Event image" hidden />
+      </div>
+
+      <div class="event-description-heading">
+
+        <div class="event-heading-content">
+          <span id="eventCategory" class="event-category">
+            Event
+          </span>
+
+          <h1 id="eventTitle">Loading event...</h1>
+
+          <div class="event-description-meta">
+            <p>
+              <span>📅</span>
+              <span id="eventDate">Loading date...</span>
+            </p>
+
+            <p>
+              <span>📍</span>
+              <span id="eventLocation">Loading location...</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="event-heading-actions">
+          <button id="rsvpButton" class="rsvp-btn" type="button">
+            Join Event
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- Lower Content -->
+    <div class="event-description-grid">
+
+      <!-- About Event -->
+      <section class="panel event-about-panel">
+
+        <div class="panel-header">
+          <h2>About This Event</h2>
+        </div>
+
+        <div class="event-about-content">
+          <p id="eventDescription">
+            Loading event description...
+          </p>
+        </div>
+
+      </section>
+
+      <!-- Attendees -->
+      <aside class="panel event-attendees-panel">
+
+        <div class="panel-header">
+          <h2>Who's Going?</h2>
+        </div>
+
+        <div id="attendeesList" class="event-attendees-list">
+          <p>Loading attendees...</p>
+        </div>
+
+      </aside>
+
+    </div>
+
+  </main>
+
+  <!-- Mobile Navigation -->
+  <nav class="mobile-nav" aria-label="Mobile navigation">
+    <a href="index.html">
+      <span>⌂</span>
+      <small>Home</small>
+    </a>
+
+    <a class="active" href="events.html">
+      <span>▣</span>
+      <small>Events</small>
+    </a>
+
+    <a href="people.html">
+      <span>♟</span>
+      <small>People</small>
+    </a>
+
+    <a href="profile.html">
+      <span>●</span>
+      <small>Profile</small>
+    </a>
+  </nav>
+
+  <!-- Scripts -->
+  <script src="javascript/config.js"></script>
+  <script type="module" src="javascript/event-description.js"></script>
+
+</body>
+</html>

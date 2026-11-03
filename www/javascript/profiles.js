@@ -172,6 +172,10 @@ function createProfileEventCard(event) {
   card.className = "event-card";
   card.dataset.eventId = String(event.event_id || "");
 
+  // Make the card keyboard-accessible
+  card.tabIndex = 0;
+  card.setAttribute("role", "link");
+
   const image = document.createElement("div");
   image.className = "event-image";
 

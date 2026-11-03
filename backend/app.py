@@ -111,11 +111,13 @@ def dashboard():
 def profiles():
     authorization = get_authorization_header()
 
+    authorization = request.headers.get("Authorization", "")
     return return_data_api_response(
         lambda: retrieve_profiles(
             authorization=authorization
         )
     )
+
 
 
 @app.get("/api/profiles/<user_id>")
@@ -170,6 +172,8 @@ def events():
 def event_by_id(event_id):
     authorization = get_authorization_header()
 
+    authorization = request.headers.get("Authorization", "")
+
     return return_data_api_response(
         lambda: retrieve_events(
             event_id=event_id,
@@ -177,10 +181,10 @@ def event_by_id(event_id):
         )
     )
 
-
 @app.get("/api/events/<event_id>/attendees")
 def event_attendees(event_id):
     authorization = get_authorization_header()
+
 
     return return_data_api_response(
         lambda: retrieve_attendees(
@@ -288,13 +292,13 @@ def create_connection_route():
 def user_connections(user_id):
     authorization = get_authorization_header()
 
+    authorization = request.headers.get("Authorization", "")
     return return_data_api_response(
         lambda: retrieve_connections(
             user_id=user_id,
             authorization=authorization
         )
     )
-
 
 # ---------------------------------------------------------
 # Invitations
