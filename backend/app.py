@@ -27,6 +27,9 @@ from controllers.data_api_controller import (
     retrieve_profiles,
     update_connection,
     save_event_rsvp,
+    create_event,
+    delete_event,
+    update_event,
 )
 
 
@@ -157,6 +160,10 @@ def create_profile_route():
 # Events
 # ---------------------------------------------------------
 
+# ---------------------------------------------------------
+# Events
+# ---------------------------------------------------------
+
 @app.get("/api/events")
 def events():
     authorization = get_authorization_header()
@@ -168,16 +175,69 @@ def events():
     )
 
 
+@app.post("/api/events")
+def create_event_route():
+    authorization = get_authorization_header()
+
+    event_data = request.get_json(
+        silent=True
+    )
+
+    if not isinstance(event_data, dict):
+        return jsonify({
+            "error": "A JSON request body is required"
+        }), 400
+
+    return return_data_api_response(
+        lambda: create_event(
+            event_data,
+            authorization
+        )
+    )
+
+
 @app.get("/api/events/<event_id>")
 def event_by_id(event_id):
     authorization = get_authorization_header()
-
-    authorization = request.headers.get("Authorization", "")
 
     return return_data_api_response(
         lambda: retrieve_events(
             event_id=event_id,
             authorization=authorization
+        )
+    )
+
+
+@app.put("/api/events/<event_id>")
+def update_event_route(event_id):
+    authorization = get_authorization_header()
+
+    event_data = request.get_json(
+        silent=True
+    )
+
+    if not isinstance(event_data, dict):
+        return jsonify({
+            "error": "A JSON request body is required"
+        }), 400
+
+    return return_data_api_response(
+        lambda: update_event(
+            event_id,
+            event_data,
+            authorization
+        )
+    )
+
+
+@app.delete("/api/events/<event_id>")
+def delete_event_route(event_id):
+    authorization = get_authorization_header()
+
+    return return_data_api_response(
+        lambda: delete_event(
+            event_id,
+            authorization
         )
     )
 
