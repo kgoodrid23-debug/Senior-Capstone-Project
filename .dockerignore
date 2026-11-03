@@ -1,0 +1,16 @@
+.git
+.gitignore
+
+.env
+**/.env
+
+.venv
+**/.venv
+
+__pycache__
+**/__pycache__
+*.pyc
+
+node_modules
+android
+data-api

@@ -1,4 +1,6 @@
-
+import {
+  authenticatedFetch
+} from "./firebase-auth.js";
 document.addEventListener("DOMContentLoaded", loadEvents);
 
 async function loadEvents() {
@@ -10,7 +12,7 @@ async function loadEvents() {
   }
 
   try {
-    const response = await fetch(getEventsUrl(), {
+    const response = await authenticatedFetch(getEventsUrl(), {
       headers: {
         Accept: "application/json"
       }
