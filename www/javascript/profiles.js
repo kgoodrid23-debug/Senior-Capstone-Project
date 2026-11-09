@@ -74,10 +74,35 @@ function renderProfile(profile) {
     bioElement.textContent = profile.bio || "";
   }
 
-  if (photoElement && profile.profile_photo_url) {
-    photoElement.src = profile.profile_photo_url;
-    photoElement.alt = `${displayName} portrait`;
+ if (photoElement) {
+  const photoUrl = String(
+    profile.profile_photo_url || ""
+  ).trim();
+
+  if (photoUrl) {
+    photoElement.onload = () => {
+      photoElement.style.display = "block";
+    };
+
+    photoElement.onerror = () => {
+      console.error(
+        "Unable to load profile photo:",
+        photoUrl
+      );
+
+      photoElement.style.display = "none";
+    };
+
+    photoElement.src = photoUrl;
+    photoElement.alt =
+      `${displayName} portrait`;
+
+    photoElement.style.display = "block";
+  } else {
+    photoElement.removeAttribute("src");
+    photoElement.style.display = "none";
   }
+}
 
   renderInterests(interestsElement, profile.interests);
 }
@@ -181,7 +206,7 @@ function createProfileEventCard(event) {
 
   if (event.image_url) {
     image.style.backgroundImage =
-      `url("${encodeURI(event.image_url)}")`;
+      `url("${event.image_url}")`;
   }
 
   const content = document.createElement("div");

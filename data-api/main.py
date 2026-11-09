@@ -215,6 +215,13 @@ def create_profile_api(user_id, email, profile_data):
         profile_data.get("date_of_birth", "")
     ).strip()
 
+    profile_photo_url = str(
+        profile_data.get(
+            "profile_photo_url",
+            ""
+        )
+    ).strip()
+
     if not first_name or not last_name:
         raise ValueError(
             "First name and last name are required."
@@ -237,7 +244,7 @@ def create_profile_api(user_id, email, profile_data):
         "date_of_birth": date_of_birth,
         "location": location,
         "bio": "",
-        "profile_photo_url": "",
+        "profile_photo_url": profile_photo_url,
         "interest_ids": [],
         "role": "user",
         "is_active": True,

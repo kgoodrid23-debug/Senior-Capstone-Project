@@ -3,6 +3,10 @@ import {
   registerUser
 } from "./firebase-auth.js";
 
+import {
+  uploadImage
+} from "./image-storage.js";
+
 
 const registerForm =
   document.getElementById("registerForm");
@@ -28,14 +32,14 @@ const passwordInput =
 const confirmPasswordInput =
   document.getElementById("confirmPassword");
 
+const profilePhotoInput =
+  document.getElementById("profilePhoto");
+
 const registerError =
   document.getElementById("registerError");
 
 const registerButton =
   document.getElementById("registerButton");
-
-const profilePhotoUrlInput =
-  document.getElementById("profilePhotoUrl");
 
 
 registerForm.addEventListener(
@@ -60,11 +64,43 @@ registerForm.addEventListener(
       "Creating Account...";
 
     try {
+      /*
+       * Create the Firebase Authentication account.
+       * Firebase automatically signs in the new user.
+       */
       await registerUser(
         emailInput.value.trim(),
         password
       );
 
+      let profilePhotoUrl = "";
+
+      const selectedPhoto =
+        profilePhotoInput.files[0];
+
+      /*
+       * Upload the selected photo to Firebase Storage.
+       * This step is skipped when no photo was selected.
+       */
+      if (selectedPhoto) {
+        registerButton.textContent =
+          "Uploading Photo...";
+
+        const uploadedPhoto = await uploadImage(
+          selectedPhoto,
+          "profile-images"
+        );
+
+        profilePhotoUrl = uploadedPhoto.url;
+      }
+
+      registerButton.textContent =
+        "Creating Profile...";
+
+      /*
+       * Send the profile information and generated Storage
+       * URL through the authenticated profile API.
+       */
       const response = await authenticatedFetch(
         getProfilesUrl(),
         {
@@ -74,11 +110,20 @@ registerForm.addEventListener(
             Accept: "application/json"
           },
           body: JSON.stringify({
-            first_name: firstNameInput.value.trim(),
-            last_name: lastNameInput.value.trim(),
-            date_of_birth: dateOfBirthInput.value,
-            location: locationInput.value.trim(),
-            profile_photo_url: profilePhotoUrlInput.value.trim()
+            first_name:
+              firstNameInput.value.trim(),
+
+            last_name:
+              lastNameInput.value.trim(),
+
+            date_of_birth:
+              dateOfBirthInput.value,
+
+            location:
+              locationInput.value.trim(),
+
+            profile_photo_url:
+              profilePhotoUrl
           })
         }
       );
@@ -87,19 +132,26 @@ registerForm.addEventListener(
 
       if (!response.ok) {
         throw new Error(
-          data.error || "Unable to create profile."
+          data.error ||
+          "Unable to create profile."
         );
       }
 
       window.location.replace("index.html");
+
     } catch (error) {
-      console.error("Registration failed:", error);
+      console.error(
+        "Registration failed:",
+        error
+      );
 
       registerError.textContent =
         getRegistrationErrorMessage(error);
+
     } finally {
       registerButton.disabled = false;
-      registerButton.textContent = "Create Account";
+      registerButton.textContent =
+        "Create Account";
     }
   }
 );
@@ -121,7 +173,8 @@ function getProfilesUrl() {
     );
 
   const isNative =
-    capacitorReportsNative || looksLikeCapacitor;
+    capacitorReportsNative ||
+    looksLikeCapacitor;
 
   const configuredBase = isNative
     ? config.NATIVE_API_BASE_URL
@@ -149,8 +202,16 @@ function getRegistrationErrorMessage(error) {
     case "auth/network-request-failed":
       return "Unable to reach Firebase.";
 
+    case "storage/unauthorized":
+      return "You do not have permission to upload this image.";
+
+    case "storage/retry-limit-exceeded":
+      return "The image upload timed out. Please try again.";
+
     default:
-      return error.message ||
-        "Unable to create your account.";
+      return (
+        error.message ||
+        "Unable to create your account."
+      );
   }
 }
