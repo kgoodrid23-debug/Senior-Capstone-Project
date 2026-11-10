@@ -52,15 +52,25 @@
         <p>See what’s happening around campus.</p>
       </div>
 
-      <label class="directory-search">
-        <span aria-hidden="true">⌕</span>
-        <input
-          id="directorySearch"
-          type="search"
-          placeholder="Search events..."
-          aria-label="Search events"
-        />
-      </label>
+      
+      
+      <div class="directory-actions">
+        <a href="create-event.html"
+          class="action-btn primary"
+          id="createEventBtn"
+          hidden>
+          + Create Event
+        </a>
+
+        <label class="directory-search">
+          <input
+            id="directorySearch"
+            type="search"
+            placeholder="Search events..."
+            aria-label="Search events"
+          />
+        </label>
+      </div>
     </section>
 
     <section aria-label="Explore Events">

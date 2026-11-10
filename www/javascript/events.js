@@ -1,7 +1,46 @@
-import {
-  authenticatedFetch
-} from "./firebase-auth.js";
+import { authenticatedFetch } from "./firebase-auth.js";
 document.addEventListener("DOMContentLoaded", loadEvents);
+
+
+async function checkOrganizerRole() {
+  const createEventBtn = document.getElementById("createEventBtn");
+
+  console.log("Create Event button:", createEventBtn);
+
+  if (!createEventBtn) return;
+
+  try {
+    const response = await authenticatedFetch(
+      getApiUrl("/api/dashboard"),
+      {
+        headers: {
+          Accept: "application/json"
+        }
+      }
+    );
+
+    console.log("Dashboard response status:", response.status);
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    console.log("Dashboard data:", data);
+    console.log("User role:", data.profile?.role);
+
+    createEventBtn.hidden =
+      String(data.profile?.role || "").trim().toLowerCase() !== "organizer";
+
+    console.log("Button hidden:", createEventBtn.hidden);
+
+  } catch (error) {
+    console.error("Unable to check organizer role:", error);
+    createEventBtn.hidden = true;
+  }
+}
+
 
 async function loadEvents() {
   const eventsGrid = document.getElementById("eventsGrid");

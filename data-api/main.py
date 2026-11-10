@@ -1,5 +1,5 @@
 import os
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 import firebase_admin
 import functions_framework
@@ -215,6 +215,13 @@ def create_profile_api(user_id, email, profile_data):
         profile_data.get("date_of_birth", "")
     ).strip()
 
+    profile_photo_url = str(
+        profile_data.get(
+            "profile_photo_url",
+            ""
+        )
+    ).strip()
+
     if not first_name or not last_name:
         raise ValueError(
             "First name and last name are required."
@@ -237,7 +244,7 @@ def create_profile_api(user_id, email, profile_data):
         "date_of_birth": date_of_birth,
         "location": location,
         "bio": "",
-        "profile_photo_url": "",
+        "profile_photo_url": profile_photo_url,
         "interest_ids": [],
         "role": "user",
         "is_active": True,
@@ -353,6 +360,278 @@ def retrieve_event_api(event_id):
 
     return map_event_document(document)
 
+ALLOWED_EVENT_STATUSES = {
+    "scheduled",
+    "completed",
+    "cancelled"
+}
+
+
+def require_organizer(user_id):
+    """
+    Require the authenticated user to have an active
+    organizer profile.
+    """
+
+    document = get_document("users", user_id)
+
+    if not document:
+        raise PermissionError(
+            "Profile not found for authenticated user."
+        )
+
+    profile = document.to_dict() or {}
+
+    if not profile.get("is_active", False):
+        raise PermissionError(
+            "The authenticated profile is inactive."
+        )
+
+    role = str(
+        profile.get("role", "user")
+    ).strip().lower()
+
+    if role != "organizer":
+        raise PermissionError(
+            "Organizer access is required."
+        )
+
+    return profile
+
+
+def parse_event_datetime(value, field_name):
+    """
+    Validate an ISO-formatted date and convert it to a
+    comparable UTC datetime.
+    """
+
+    try:
+        parsed_value = datetime.fromisoformat(
+            str(value).replace("Z", "+00:00")
+        )
+
+    except (TypeError, ValueError) as error:
+        raise ValueError(
+            f"{field_name} must be a valid date and time."
+        ) from error
+
+    if parsed_value.tzinfo is None:
+        parsed_value = parsed_value.replace(
+            tzinfo=timezone.utc
+        )
+
+    return parsed_value.astimezone(timezone.utc)
+
+
+def validate_event_data(event_data):
+    """
+    Validate frontend event data and map it to the fields
+    stored in Firestore.
+    """
+
+    title = str(
+        event_data.get(
+            "title",
+            event_data.get("event_name", "")
+        )
+    ).strip()
+
+    description = str(
+        event_data.get("description", "")
+    ).strip()
+
+    category = str(
+        event_data.get("category", "Event")
+    ).strip() or "Event"
+
+    start_time = str(
+        event_data.get(
+            "start_time",
+            event_data.get("date", "")
+        )
+    ).strip()
+
+    end_time = str(
+        event_data.get("end_time", "")
+    ).strip()
+
+    location = str(
+        event_data.get("location", "")
+    ).strip()
+
+    image_url = str(
+        event_data.get("image_url", "")
+    ).strip()
+
+    if not title:
+        raise ValueError("Event title is required.")
+
+    if not start_time:
+        raise ValueError(
+            "Event start time is required."
+        )
+
+    if not location:
+        raise ValueError(
+            "Event location is required."
+        )
+
+    parsed_start_time = parse_event_datetime(
+        start_time,
+        "start_time"
+    )
+
+    if end_time:
+        parsed_end_time = parse_event_datetime(
+            end_time,
+            "end_time"
+        )
+
+        if parsed_end_time <= parsed_start_time:
+            raise ValueError(
+                "Event end time must be later than "
+                "the start time."
+            )
+
+    return {
+        "event_name": title,
+        "description": description,
+        "category": category,
+        "date": start_time,
+        "end_time": end_time or None,
+        "location": location,
+        "image_url": image_url
+    }
+
+
+def create_event_api(
+    authenticated_user_id,
+    event_data
+):
+    require_organizer(authenticated_user_id)
+
+    validated_data = validate_event_data(
+        event_data
+    )
+
+    document_reference = (
+        db.collection("events")
+        .document()
+    )
+
+    event_id = document_reference.id
+
+    document_reference.set({
+        **validated_data,
+        "event_id": event_id,
+        "created_by": authenticated_user_id,
+        "is_active": True,
+        "status": "scheduled",
+        "created_at": firestore.SERVER_TIMESTAMP,
+        "updated_at": firestore.SERVER_TIMESTAMP
+    })
+
+    saved_document = document_reference.get()
+
+    return map_event_document(saved_document)
+
+
+def update_event_api(
+    event_id,
+    authenticated_user_id,
+    event_data
+):
+    require_organizer(authenticated_user_id)
+
+    document_reference = (
+        db.collection("events")
+        .document(str(event_id))
+    )
+
+    document = document_reference.get()
+
+    if not document.exists:
+        return None
+
+    existing_event = document.to_dict() or {}
+
+    creator_id = (
+        existing_event.get("created_by")
+        or existing_event.get(
+            "created_by_user_id"
+        )
+    )
+
+    if creator_id != authenticated_user_id:
+        raise PermissionError(
+            "You can only edit events you created."
+        )
+
+    if not existing_event.get("is_active", False):
+        raise ValueError(
+            "Cancelled events cannot be edited."
+        )
+
+    validated_data = validate_event_data(
+        event_data
+    )
+
+    document_reference.update({
+        **validated_data,
+        "updated_at": firestore.SERVER_TIMESTAMP
+    })
+
+    updated_document = document_reference.get()
+
+    return map_event_document(updated_document)
+
+
+def delete_event_api(
+    event_id,
+    authenticated_user_id
+):
+    require_organizer(authenticated_user_id)
+
+    document_reference = (
+        db.collection("events")
+        .document(str(event_id))
+    )
+
+    document = document_reference.get()
+
+    if not document.exists:
+        return None
+
+    existing_event = document.to_dict() or {}
+
+    creator_id = (
+        existing_event.get("created_by")
+        or existing_event.get(
+            "created_by_user_id"
+        )
+    )
+
+    if creator_id != authenticated_user_id:
+        raise PermissionError(
+            "You can only cancel events you created."
+        )
+
+    document_reference.update({
+        "is_active": False,
+        "status": "cancelled",
+        "updated_at": firestore.SERVER_TIMESTAMP
+    })
+
+    cancelled_document = document_reference.get()
+    cancelled_event = map_event_document(
+        cancelled_document
+    )
+
+    cancelled_event["message"] = (
+        "Event cancelled successfully"
+    )
+
+    return cancelled_event
 
 # ---------------------------------------------------------
 # Interests
@@ -916,6 +1195,118 @@ def api(request):
 
             status_code = 201 if was_created else 200
             return jsonify(profile), status_code
+
+                # -----------------------------------------------------
+        # POST /api/events
+        # -----------------------------------------------------
+
+        if (
+            request.method == "POST"
+            and path_parts == ["api", "events"]
+        ):
+            event_data = request.get_json(
+                silent=True
+            )
+
+            if not isinstance(event_data, dict):
+                return jsonify({
+                    "error": (
+                        "A JSON request body is required"
+                    )
+                }), 400
+
+            try:
+                event = create_event_api(
+                    authenticated_user_id,
+                    event_data
+                )
+
+            except PermissionError as error:
+                return jsonify({
+                    "error": str(error)
+                }), 403
+
+            except ValueError as error:
+                return jsonify({
+                    "error": str(error)
+                }), 400
+
+            return jsonify(event), 201
+
+        # -----------------------------------------------------
+        # PUT /api/events/{event_id}
+        # -----------------------------------------------------
+
+        if (
+            request.method == "PUT"
+            and len(path_parts) == 3
+            and path_parts[:2] == ["api", "events"]
+        ):
+            event_id = path_parts[2]
+
+            event_data = request.get_json(
+                silent=True
+            )
+
+            if not isinstance(event_data, dict):
+                return jsonify({
+                    "error": (
+                        "A JSON request body is required"
+                    )
+                }), 400
+
+            try:
+                event = update_event_api(
+                    event_id,
+                    authenticated_user_id,
+                    event_data
+                )
+
+            except PermissionError as error:
+                return jsonify({
+                    "error": str(error)
+                }), 403
+
+            except ValueError as error:
+                return jsonify({
+                    "error": str(error)
+                }), 400
+
+            if not event:
+                return jsonify({
+                    "error": "Event not found"
+                }), 404
+
+            return jsonify(event), 200
+
+        # -----------------------------------------------------
+        # DELETE /api/events/{event_id}
+        # -----------------------------------------------------
+
+        if (
+            request.method == "DELETE"
+            and len(path_parts) == 3
+            and path_parts[:2] == ["api", "events"]
+        ):
+            event_id = path_parts[2]
+
+            try:
+                event = delete_event_api(
+                    event_id,
+                    authenticated_user_id
+                )
+
+            except PermissionError as error:
+                return jsonify({
+                    "error": str(error)
+                }), 403
+
+            if not event:
+                return jsonify({
+                    "error": "Event not found"
+                }), 404
+
+            return jsonify(event), 200
 
         # -----------------------------------------------------
         # POST /api/connections

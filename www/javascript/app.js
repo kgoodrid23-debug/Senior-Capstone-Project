@@ -36,6 +36,11 @@ async function loadDashboard() {
 
     const data = await response.json();
 
+    const createEventBtn = document.getElementById("createEventBtn");
+    if (createEventBtn) {
+      createEventBtn.hidden = data.profile?.role !== "organizer";
+    }
+
     renderProfile(
       data.profile,
       profileName,
@@ -119,11 +124,13 @@ function renderProfile(
 
   if (profileNameEl) {
     profileNameEl.textContent =
-      profile.display_name || "Profile unavailable";
+      profile.display_name ||
+      "Profile unavailable";
   }
 
   if (profileStatusEl) {
-    profileStatusEl.textContent = profile.bio || "";
+    profileStatusEl.textContent =
+      profile.bio || "";
   }
 
   if (profileLocationEl) {
@@ -131,25 +138,62 @@ function renderProfile(
       profile.location || "";
   }
 
-  if (
-    profileImageEl &&
-    profile.profile_photo_url
-  ) {
-    profileImageEl.style.backgroundImage =
-      `url("${encodeURI(profile.profile_photo_url)}")`;
+  if (profileImageEl) {
+    const photoUrl = String(
+      profile.profile_photo_url || ""
+    ).trim();
 
-    profileImageEl.classList.add("has-image");
+    if (photoUrl) {
+      profileImageEl.style.backgroundImage =
+        `url("${photoUrl}")`;
+
+      profileImageEl.style.backgroundPosition =
+        "center";
+
+      profileImageEl.style.backgroundSize =
+        "cover";
+
+      profileImageEl.style.backgroundRepeat =
+        "no-repeat";
+
+      profileImageEl.classList.remove(
+        "profile-avatar-placeholder"
+      );
+
+      profileImageEl.classList.add(
+        "has-image"
+      );
+
+      profileImageEl.setAttribute(
+        "aria-label",
+        `${profile.display_name || "User"} profile photo`
+      );
+    } else {
+      profileImageEl.style.removeProperty(
+        "background-image"
+      );
+
+      profileImageEl.classList.add(
+        "profile-avatar-placeholder"
+      );
+
+      profileImageEl.classList.remove(
+        "has-image"
+      );
+    }
   }
 
   if (profileInterestsEl) {
     profileInterestsEl.replaceChildren();
 
-    const interests = Array.isArray(profile.interests)
-      ? profile.interests
-      : [];
+    const interests =
+      Array.isArray(profile.interests)
+        ? profile.interests
+        : [];
 
     interests.forEach((interest) => {
-      const chip = document.createElement("span");
+      const chip =
+        document.createElement("span");
 
       chip.className = "chip";
       chip.textContent = String(interest);
@@ -158,7 +202,6 @@ function renderProfile(
     });
   }
 }
-
 
 function renderEvents(events, eventsGridEl) {
   if (!eventsGridEl) return;

@@ -198,38 +198,69 @@ function createProfileCard(profile) {
     document.createElement("div");
 
   photoContainer.className =
-    "person-photo-container";
+  "directory-person-photo person-photo-container";
 
   if (profile.profile_photo_url) {
-    const photo = document.createElement("img");
+  const photo = document.createElement("img");
 
-    photo.className =
-      "person-photo person-avatar";
+  photo.className =
+    "person-photo person-avatar";
 
-    photo.src = profile.profile_photo_url;
-    photo.alt =
-      `${profile.display_name || "User"} profile`;
+  photo.alt =
+    `${profile.display_name || "User"} profile`;
 
-    photoContainer.appendChild(photo);
-  } else {
+  const photoUrl = String(
+    profile.profile_photo_url
+  ).trim();
+
+  photo.onload = () => {
+    photo.style.display = "block";
+  };
+
+  photo.onerror = () => {
+    console.error(
+      "Unable to load People page photo:",
+      photoUrl
+    );
+
     const placeholder =
       document.createElement("div");
 
     placeholder.className =
-      "person-photo person-avatar person-avatar-placeholder";
+      "person-photo person-avatar " +
+      "person-avatar-placeholder";
 
     placeholder.textContent = getInitial(
       profile.display_name
     );
 
-    photoContainer.appendChild(placeholder);
-  }
+    photo.replaceWith(placeholder);
+  };
+
+  photo.src = photoUrl;
+
+  photoContainer.appendChild(photo);
+} else {
+  const placeholder =
+    document.createElement("div");
+
+  placeholder.className =
+    "person-photo person-avatar " +
+    "person-avatar-placeholder";
+
+  placeholder.textContent = getInitial(
+    profile.display_name
+  );
+
+  photoContainer.appendChild(placeholder);
+}
 
   const content =
     document.createElement("div");
 
   content.className =
-    "person-content person-card-body";
+  "directory-person-details " +
+  "person-content person-card-body";
 
   const name = document.createElement("h3");
 

@@ -1,0 +1,122 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#3f55f4" />
+  <title>Buddiez &amp; Bandz | Create Event</title>
+  <link rel="icon" href="assets/app-icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="event-form-page-body" data-event-mode="create">
+  <header class="site-header">
+    <div class="page header-inner">
+      <a href="index.html" class="brand">
+        <div class="brand-icon"><span></span></div>
+        <div class="brand-copy">
+          Buddiez &amp; Bandz
+          <small>EVENTS · PEOPLE · REAL CONNECTIONS</small>
+        </div>
+      </a>
+      <nav class="event-form-nav">
+        <a href="index.html">Dashboard</a>
+        <a href="events.html">Events</a>
+        <a href="people.html">People</a>
+        <a href="profile.html">Profile</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page event-form-layout">
+    <div class="event-form-heading">
+      <a href="index.html" class="event-form-back">← Back</a>
+      <h1>Create Event</h1>
+      <p>Enter the event information below to publish a new event.</p>
+    </div>
+
+    <section class="event-form-card">
+      <form id="event-form">
+        <div class="event-form-section">
+          <h2>Basic Information</h2>
+          <div class="event-form-grid">
+            <div class="event-form-field full">
+              <label for="title">Event Title *</label>
+              <input id="title" name="title" type="text" placeholder="Enter event title" required />
+            </div>
+            <div class="event-form-field full">
+              <label for="description">Description *</label>
+              <textarea id="description" name="description" rows="5" placeholder="Describe your event..." required></textarea>
+            </div>
+            <div class="event-form-field">
+              <label for="category">Category</label>
+              <select id="category" name="category">
+                <option value="">Select a category</option>
+                <option value="Music">Music</option>
+                <option value="Sports">Sports</option>
+                <option value="Arts">Arts &amp; Entertainment</option>
+                <option value="Food">Food &amp; Drink</option>
+                <option value="Social">Social</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="event-form-field">
+              <label for="image_url">Event Image URL</label>
+              <input id="image_url" name="image_url" type="url" placeholder="https://example.com/image.jpg" />
+            </div>
+          </div>
+        </div>
+
+        <div class="event-form-section">
+          <h2>Date &amp; Location</h2>
+          <div class="event-form-grid">
+            <div class="event-form-field">
+              <label for="start_time">Start Date &amp; Time *</label>
+              <input id="start_time" name="start_time" type="datetime-local" required />
+            </div>
+            <div class="event-form-field">
+              <label for="end_time">End Date &amp; Time</label>
+              <input id="end_time" name="end_time" type="datetime-local" />
+            </div>
+            <div class="event-form-field">
+              <label for="venue">Venue</label>
+              <input id="venue" name="venue" type="text" placeholder="Event venue" />
+            </div>
+            <div class="event-form-field">
+              <label for="location">Location *</label>
+              <input id="location" name="location" type="text" placeholder="Evansville, IN" required />
+            </div>
+          </div>
+        </div>
+
+        <div class="event-form-section">
+          <h2>Additional Details</h2>
+          <div class="event-form-grid">
+            <div class="event-form-field">
+              <label for="price">Ticket Price ($)</label>
+              <input id="price" name="price" type="number" min="0" step="0.01" placeholder="0.00" />
+            </div>
+            <div class="event-form-field">
+              <label for="capacity">Maximum Attendees</label>
+              <input id="capacity" name="capacity" type="number" min="1" step="1" placeholder="Optional" />
+            </div>
+            <div class="event-form-field full">
+              <label for="ticket_url">Ticket / Registration URL</label>
+              <input id="ticket_url" name="ticket_url" type="url" placeholder="https://example.com/tickets" />
+            </div>
+          </div>
+        </div>
+
+        <p id="event-form-status" class="event-form-status" role="status" aria-live="polite"></p>
+
+        <div class="event-form-actions">
+          <a href="index.html" class="event-form-cancel">Cancel</a>
+          <button id="event-submit" type="submit" class="event-form-submit">Create Event</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script type="module" src="javascript/event-form.js"></script>
+</body>
+</html>

@@ -104,15 +104,19 @@
         </div>
 
         <div class="form-field">
-          <label for="profilePhotoUrl">Profile Photo URL</label>
+          <label for="profilePhoto">Profile Photo</label>
 
           <input
             class="field-control"
-            type="url"
-            id="profilePhotoUrl"
-            name="profile_photo_url"
-            placeholder="https://example.com/photo.jpg"
-          />
+            type="file"
+            id="profilePhoto"
+            name="profilePhoto"
+            accept="image/jpeg,image/png,image/webp"
+          >
+
+          <small>
+            Optional. Select a JPG, PNG, or WebP image under 5 MB.
+          </small>
         </div>
 
         <div class="form-field">

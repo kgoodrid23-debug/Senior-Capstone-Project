@@ -178,6 +178,35 @@ def retrieve_events(
         authorization=authorization
     )
 
+def create_event(event_data, authorization):
+    return _post(
+        "/api/events",
+        payload=event_data,
+        authorization=authorization
+    )
+
+
+def update_event(
+    event_id,
+    event_data,
+    authorization
+):
+    safe_id = quote(str(event_id), safe="")
+
+    return _put(
+        f"/api/events/{safe_id}",
+        payload=event_data,
+        authorization=authorization
+    )
+
+
+def delete_event(event_id, authorization):
+    safe_id = quote(str(event_id), safe="")
+
+    return _delete(
+        f"/api/events/{safe_id}",
+        authorization=authorization
+    )
 
 # ---------------------------------------------------------
 # Interests
