@@ -4,13 +4,38 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Buddiez &amp; Bandz | Edit Profile</title>
-    <link rel="stylesheet" href="style.css?v=20260929-universal-3" />
+    <link rel="stylesheet" href="www/style.css" />
+  <style>
+  .theme-soft { background:#dfeaf7; color:#1d2247; min-height:100vh; font-family:Inter,"Segoe UI",sans-serif; }
+  .content { width:min(100% - 32px,680px); margin:42px auto 60px; }
+  .card--padded { background:#fff; border:1px solid #d6dceb; border-radius:18px; padding:34px; box-shadow:0 8px 24px rgba(34,52,107,.09); }
+  .section-header { text-align:center; margin-bottom:26px; }
+  .section-title { color:#1d2a68; font-size:30px; margin:0; }
+  .form-stack { display:flex; flex-direction:column; gap:20px; width:100%; }
+  .grid--2 { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+  .form-field { display:flex; flex-direction:column; gap:8px; min-width:0; }
+  .form-field label, .form-fieldset legend { font-size:14px; font-weight:700; color:#25346d; }
+  .field-control { width:100%; min-height:46px; box-sizing:border-box; padding:12px 14px; border:1px solid #cbd4e8; border-radius:10px; background:#fff; color:#1d2247; font:inherit; }
+  .field-control:focus { outline:2px solid #6475fa; outline-offset:1px; border-color:#3f55f4; }
+  textarea.field-control { resize:vertical; }
+  .form-fieldset { border:0; padding:0; margin:0; }
+  .form-fieldset legend { margin-bottom:12px; }
+  .badge-list { display:flex; flex-wrap:wrap; gap:10px; }
+  .badge--tag { display:inline-flex; align-items:center; gap:7px; padding:9px 12px; border-radius:16px; background:#e7eaff; color:#3344a4; font-size:14px; cursor:pointer; }
+  .badge--tag input { accent-color:#3f55f4; }
+  .button-group { display:flex; justify-content:center; flex-wrap:wrap; gap:12px; margin-top:6px; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:12px 24px; border-radius:10px; font:inherit; font-weight:700; text-decoration:none; cursor:pointer; border:1px solid transparent; }
+  .btn--primary { background:#3f55f4; color:#fff; }
+  .btn--primary:hover { background:#3044d8; }
+  .btn--outline { background:#fff; border-color:#3f55f4; color:#3f55f4; }
+  @media(max-width:600px) { .content { margin:24px auto 40px; } .card--padded { padding:24px 20px; } .grid--2 { grid-template-columns:1fr; } }
+</style>
   </head>
 
   <body class="theme-soft">
     <header class="site-header">
       <div class="container header-inner">
-        <a href="index.html" class="brand">
+        <a href="www/index.html" class="brand">
           <div class="brand-icon"><span></span></div>
           <div class="brand-copy">
             Buddiez &amp; Bandz
@@ -25,19 +50,19 @@
         </button>
 
         <nav class="nav" aria-label="Main navigation">
-          <a class="nav-link" href="index.html">
+          <a class="nav-link" href="www/index.html">
             <span class="nav-icon">⌂</span>
             <span>Home</span>
           </a>
-          <a class="nav-link" href="events.html">
+          <a class="nav-link" href="www/events.html">
             <span class="nav-icon">▣</span>
             <span>Events</span>
           </a>
-          <a class="nav-link" href="people.html">
+          <a class="nav-link" href="www/people.html">
             <span class="nav-icon">♟</span>
             <span>People</span>
           </a>
-          <a class="nav-link active" href="profile.html">
+          <a class="nav-link active" href="www/profile.html">
             <span class="nav-icon">●</span>
             <span>Profile</span>
           </a>
@@ -103,7 +128,7 @@
 
           <div class="button-group">
             <button type="submit" class="btn btn--primary">Save Changes</button>
-            <a href="profile.html" class="btn btn--outline">Cancel</a>
+            <a href="www/profile.html" class="btn btn--outline">Cancel</a>
           </div>
         </form>
       </section>
