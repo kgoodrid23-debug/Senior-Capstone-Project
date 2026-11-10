@@ -94,11 +94,31 @@ async function loadEventDetails(eventId) {
     document.getElementById("eventDescription").textContent =
       event.description || "No description available.";
 
-    const image = document.getElementById("eventImage");
+    const image =
+      document.getElementById("eventImage");
 
-    if (event.image_url && image) {
-      image.src = event.image_url;
-      image.hidden = false;
+    const imageUrl = String(
+      event.image_url || ""
+    ).trim();
+
+    if (image && imageUrl) {
+      image.onload = () => {
+        image.hidden = false;
+      };
+
+      image.onerror = () => {
+        console.error(
+          "Unable to load event image:",
+          imageUrl
+        );
+
+        image.hidden = true;
+      };
+
+      image.src = imageUrl;
+    } else if (image) {
+      image.removeAttribute("src");
+      image.hidden = true;
     }
 
   } catch (error) {

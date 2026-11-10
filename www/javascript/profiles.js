@@ -2,8 +2,27 @@ import {
   authenticatedFetch
 } from "./firebase-auth.js";
 
-document.addEventListener("DOMContentLoaded", loadProfilePage);
+document.addEventListener(
+  "DOMContentLoaded",
+  initializeProfilePage
+);
 
+function initializeProfilePage() {
+  const editProfileButton =
+    document.getElementById(
+      "editProfileButton"
+    );
+
+  editProfileButton?.addEventListener(
+    "click",
+    () => {
+      window.location.href =
+        "edit-profile-firebase-connected.html";
+    }
+  );
+
+  loadProfilePage();
+}
 async function loadProfilePage() {
   const eventsGrid = document.getElementById("profileEventsGrid");
 
@@ -204,9 +223,21 @@ function createProfileEventCard(event) {
   const image = document.createElement("div");
   image.className = "event-image";
 
-  if (event.image_url) {
+  const imageUrl = String(
+    event.image_url || ""
+  ).trim();
+
+  if (imageUrl) {
     image.style.backgroundImage =
-      `url("${event.image_url}")`;
+      `url("${imageUrl}")`;
+
+    image.style.backgroundPosition = "center";
+    image.style.backgroundSize = "cover";
+    image.style.backgroundRepeat = "no-repeat";
+  } else {
+    image.classList.add(
+      "event-image-placeholder"
+    );
   }
 
   const content = document.createElement("div");

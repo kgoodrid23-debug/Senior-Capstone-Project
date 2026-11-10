@@ -235,16 +235,23 @@ function renderEvents(events, eventsGridEl) {
     }
 
     const image = document.createElement("div");
+    image.className = "event-image";
 
-    image.className =
-      "event-image event-image-placeholder";
+    const imageUrl = String(
+      event.image_url || ""
+    ).trim();
 
-    if (event.image_url) {
+    if (imageUrl) {
       image.style.backgroundImage =
-        `url("${encodeURI(event.image_url)}")`;
+        `url("${imageUrl}")`;
 
       image.style.backgroundPosition = "center";
       image.style.backgroundSize = "cover";
+      image.style.backgroundRepeat = "no-repeat";
+    } else {
+      image.classList.add(
+        "event-image-placeholder"
+      );
     }
 
     const body = document.createElement("div");

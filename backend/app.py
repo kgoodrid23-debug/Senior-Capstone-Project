@@ -30,6 +30,7 @@ from controllers.data_api_controller import (
     create_event,
     delete_event,
     update_event,
+    update_profile
 )
 
 
@@ -150,6 +151,33 @@ def create_profile_route():
 
     return return_data_api_response(
         lambda: create_profile(
+            profile_data,
+            authorization
+        )
+    )
+
+@app.put("/api/profiles")
+def update_profile_route():
+    authorization = (
+        get_authorization_header()
+    )
+
+    profile_data = request.get_json(
+        silent=True
+    )
+
+    if not isinstance(
+        profile_data,
+        dict
+    ):
+        return jsonify({
+            "error": (
+                "A JSON request body is required"
+            )
+        }), 400
+
+    return return_data_api_response(
+        lambda: update_profile(
             profile_data,
             authorization
         )
