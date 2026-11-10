@@ -1388,3 +1388,335 @@
 .directory-actions {display:flex;flex-direction:column;align-items:flex-end;gap:12px;}
 .directory-actions .action-btn {padding:10px 20px;text-decoration:none;}
 #createEventBtn[hidden] {display:none !important;}
+
+/* ---------------------------------------------------------
+   Edit Profile
+--------------------------------------------------------- */
+
+.edit-profile-page {
+  background: #dfeaf7;
+  color: #1d2247;
+  min-height: 100vh;
+  font-family: Inter, "Segoe UI", sans-serif;
+}
+
+.edit-profile-page .content {
+  width: min(100% - 32px, 680px);
+  margin: 42px auto 60px;
+}
+
+.edit-profile-page .card--padded {
+  background: #fff;
+  border: 1px solid #d6dceb;
+  border-radius: 18px;
+  padding: 34px;
+  box-shadow: 0 8px 24px
+    rgba(34, 52, 107, 0.09);
+}
+
+.edit-profile-page .section-header {
+  text-align: center;
+  margin-bottom: 26px;
+}
+
+.edit-profile-page .section-title {
+  color: #1d2a68;
+  font-size: 30px;
+  margin: 0;
+}
+
+.edit-profile-page .form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.edit-profile-page .grid--2 {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.edit-profile-page .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.edit-profile-page .form-field label,
+.edit-profile-page .form-fieldset legend {
+  color: #25346d;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.edit-profile-page .field-control {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 14px;
+  border: 1px solid #cbd4e8;
+  border-radius: 10px;
+  background: #fff;
+  color: #1d2247;
+  font: inherit;
+}
+
+.edit-profile-page .field-control:focus {
+  outline: 2px solid #6475fa;
+  outline-offset: 1px;
+  border-color: #3f55f4;
+}
+
+.edit-profile-page textarea.field-control {
+  resize: vertical;
+}
+
+.edit-profile-page .form-fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.edit-profile-page .form-fieldset legend {
+  margin-bottom: 12px;
+}
+
+.edit-profile-page .badge-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.edit-profile-page .badge--tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border-radius: 16px;
+  background: #e7eaff;
+  color: #3344a4;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.edit-profile-page .badge--tag input {
+  accent-color: #3f55f4;
+}
+
+.edit-profile-page .button-group {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+@media (max-width: 600px) {
+  .edit-profile-page .content {
+    margin: 24px auto 40px;
+  }
+
+  .edit-profile-page .card--padded {
+    padding: 24px 20px;
+  }
+
+  .edit-profile-page .grid--2 {
+    grid-template-columns: 1fr;
+  }
+}
+/* =========================================================
+   Authentication pages: Login and Registration
+   ========================================================= */
+
+.auth-page {
+  background: #dfeaf7;
+  color: #1d2247;
+  min-height: 100vh;
+  font-family: Inter, "Segoe UI", sans-serif;
+}
+
+.auth-page .auth-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding: 36px 20px;
+}
+
+.auth-page .auth-card {
+  width: 100%;
+  max-width: 480px;
+  box-sizing: border-box;
+  padding: 36px;
+  background: #fff;
+  border: 1px solid #d6dceb;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(34, 52, 107, 0.09);
+}
+
+.auth-page .auth-card .brand {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.auth-page .auth-heading {
+  margin-bottom: 26px;
+  text-align: center;
+}
+
+.auth-page .auth-heading h1 {
+  margin: 0 0 8px;
+  color: #1d2a68;
+  font-size: 30px;
+}
+
+.auth-page .auth-heading p {
+  margin: 0;
+  color: #53608b;
+  line-height: 1.5;
+}
+
+.auth-page .form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+  width: 100%;
+}
+
+.auth-page .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.auth-page .form-field label,
+.auth-page .form-fieldset legend {
+  color: #25346d;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.auth-page .field-control {
+  width: 100%;
+  min-height: 46px;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid #cbd4e8;
+  border-radius: 10px;
+  background: #fff;
+  color: #1d2247;
+  font: inherit;
+}
+
+.auth-page .field-control:focus {
+  border-color: #3f55f4;
+  outline: 2px solid #6475fa;
+  outline-offset: 1px;
+}
+
+.auth-page .field-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.auth-page .text-link {
+  color: #3f55f4;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.auth-page .text-link:hover {
+  text-decoration: underline;
+}
+
+.auth-page .checkbox-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #53608b;
+  font-size: 14px;
+}
+
+.auth-page .checkbox-field input {
+  accent-color: #3f55f4;
+}
+
+.auth-page .form-error {
+  margin: 0;
+  color: #b42332;
+  font-size: 14px;
+}
+
+.auth-page .form-error:empty {
+  display: none;
+}
+
+.auth-page .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 12px 20px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.auth-page .btn--primary {
+  background: #3f55f4;
+  color: #fff;
+}
+
+.auth-page .btn--primary:hover {
+  background: #3044d8;
+}
+
+.auth-page .btn--primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.auth-page .btn--outline {
+  border-color: #3f55f4;
+  background: #fff;
+  color: #3f55f4;
+}
+
+.auth-page .btn--block {
+  width: 100%;
+}
+
+.auth-page .auth-footer {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 24px;
+  color: #53608b;
+  font-size: 14px;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .auth-page .auth-card {
+    padding: 25px 20px;
+  }
+
+  .auth-page .auth-heading h1 {
+    font-size: 26px;
+  }
+}
