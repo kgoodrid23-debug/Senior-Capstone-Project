@@ -134,13 +134,21 @@ function createEventCard(event) {
   const image = document.createElement("div");
   image.className = "event-image";
 
-  if (event.image_url) {
+  const imageUrl = String(
+    event.image_url || ""
+  ).trim();
+
+  if (imageUrl) {
     image.style.backgroundImage =
-      `url("${encodeURI(event.image_url)}")`;
+      `url("${imageUrl}")`;
+
     image.style.backgroundPosition = "center";
     image.style.backgroundSize = "cover";
+    image.style.backgroundRepeat = "no-repeat";
   } else {
-    image.classList.add("event-image-placeholder");
+    image.classList.add(
+      "event-image-placeholder"
+    );
   }
 
   // Event content

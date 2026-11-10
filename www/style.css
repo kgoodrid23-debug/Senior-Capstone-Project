@@ -775,10 +775,11 @@
     }
 
     .event-image {
-      height: 150px;
-      background-size: cover;
-      background-position: center;
-    }
+    min-height: 180px;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
 
     .event-content {
       position: relative;
@@ -1719,4 +1720,26 @@
   .auth-page .auth-heading h1 {
     font-size: 26px;
   }
+}
+.event-form-help {
+  display: block;
+  margin-top: 6px;
+  color: #667085;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.event-image-preview {
+  display: block;
+  width: 100%;
+  max-width: 320px;
+  height: 180px;
+  margin-top: 14px;
+  border: 1px solid #d6dceb;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.event-image-preview[hidden] {
+  display: none;
 }
