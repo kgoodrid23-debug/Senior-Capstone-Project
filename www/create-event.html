@@ -61,8 +61,25 @@
               </select>
             </div>
             <div class="event-form-field">
-              <label for="image_url">Event Image URL</label>
-              <input id="image_url" name="image_url" type="url" placeholder="https://example.com/image.jpg" />
+              <label for="event_image">Event Image</label>
+
+              <input
+                id="event_image"
+                name="event_image"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+              />
+
+              <small class="event-form-help">
+                Optional. Select a JPG, PNG, or WebP image under 5 MB.
+              </small>
+
+              <img
+                id="event-image-preview"
+                class="event-image-preview"
+                alt="Selected event preview"
+                hidden
+              />
             </div>
           </div>
         </div>
