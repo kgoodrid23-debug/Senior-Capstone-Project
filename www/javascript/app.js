@@ -36,6 +36,11 @@ async function loadDashboard() {
 
     const data = await response.json();
 
+    const createEventBtn = document.getElementById("createEventBtn");
+    if (createEventBtn) {
+      createEventBtn.hidden = data.profile?.role !== "organizer";
+    }
+
     renderProfile(
       data.profile,
       profileName,

@@ -1384,3 +1384,7 @@
     font-size: 28px;
   }
 }
+#createEventBtn[hidden] {display:none !important;}
+.directory-actions {display:flex;flex-direction:column;align-items:flex-end;gap:12px;}
+.directory-actions .action-btn {padding:10px 20px;text-decoration:none;}
+#createEventBtn[hidden] {display:none !important;}
