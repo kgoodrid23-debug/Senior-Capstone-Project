@@ -2,8 +2,27 @@ import {
   authenticatedFetch
 } from "./firebase-auth.js";
 
-document.addEventListener("DOMContentLoaded", loadProfilePage);
+document.addEventListener(
+  "DOMContentLoaded",
+  initializeProfilePage
+);
 
+function initializeProfilePage() {
+  const editProfileButton =
+    document.getElementById(
+      "editProfileButton"
+    );
+
+  editProfileButton?.addEventListener(
+    "click",
+    () => {
+      window.location.href =
+        "edit-profile-firebase-connected.html";
+    }
+  );
+
+  loadProfilePage();
+}
 async function loadProfilePage() {
   const eventsGrid = document.getElementById("profileEventsGrid");
 

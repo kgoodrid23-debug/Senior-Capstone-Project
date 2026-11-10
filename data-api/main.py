@@ -5,7 +5,7 @@ import firebase_admin
 import functions_framework
 import hashlib
 from firebase_admin import auth, firestore
-from flask import jsonify
+from flask import jsonify, request
 from google.cloud.firestore_v1.base_query import FieldFilter
 
 
@@ -252,6 +252,200 @@ def create_profile_api(user_id, email, profile_data):
     })
 
     return retrieve_profile_api(user_id), True
+
+def update_profile_api(
+    user_id,
+    profile_data
+):
+    profile_reference = (
+        db.collection("users")
+        .document(user_id)
+    )
+
+    profile_snapshot = (
+        profile_reference.get()
+    )
+
+    if not profile_snapshot.exists:
+        return None
+
+    updates = {}
+
+    if "display_name" in profile_data:
+        display_name = str(
+            profile_data.get(
+                "display_name",
+                ""
+            )
+        ).strip()
+
+        if not display_name:
+            raise ValueError(
+                "Display name is required."
+            )
+
+        if len(display_name) > 100:
+            raise ValueError(
+                "Display name cannot exceed "
+                "100 characters."
+            )
+
+        updates["display_name"] = (
+            display_name
+        )
+
+        name_parts = display_name.split(
+            maxsplit=1
+        )
+
+        updates["first_name"] = name_parts[0]
+        updates["last_name"] = (
+            name_parts[1]
+            if len(name_parts) > 1
+            else ""
+        )
+
+    if "date_of_birth" in profile_data:
+        date_of_birth = str(
+            profile_data.get(
+                "date_of_birth",
+                ""
+            )
+        ).strip()
+
+        try:
+            parsed_birth_date = (
+                date.fromisoformat(
+                    date_of_birth
+                )
+            )
+        except ValueError as error:
+            raise ValueError(
+                "Date of birth must be a "
+                "valid date."
+            ) from error
+
+        if parsed_birth_date >= date.today():
+            raise ValueError(
+                "Date of birth must be "
+                "in the past."
+            )
+
+        updates["date_of_birth"] = (
+            date_of_birth
+        )
+
+    if "location" in profile_data:
+        location = str(
+            profile_data.get(
+                "location",
+                ""
+            )
+        ).strip()
+
+        if not location:
+            raise ValueError(
+                "Location is required."
+            )
+
+        if len(location) > 255:
+            raise ValueError(
+                "Location cannot exceed "
+                "255 characters."
+            )
+
+        updates["location"] = location
+
+    if "bio" in profile_data:
+        bio = str(
+            profile_data.get(
+                "bio",
+                ""
+            )
+        ).strip()
+
+        if len(bio) > 1000:
+            raise ValueError(
+                "Bio cannot exceed "
+                "1,000 characters."
+            )
+
+        updates["bio"] = bio
+
+    if "interests" in profile_data:
+        interests = profile_data.get(
+            "interests"
+        )
+
+        if not isinstance(
+            interests,
+            list
+        ):
+            raise ValueError(
+                "Interests must be a list."
+            )
+
+        cleaned_interest_ids = []
+
+        for interest in interests:
+            interest_id = (
+                str(interest)
+                .strip()
+                .lower()
+                .replace(" ", "_")
+            )
+
+            if (
+                interest_id
+                and interest_id
+                not in cleaned_interest_ids
+            ):
+                cleaned_interest_ids.append(
+                    interest_id
+                )
+
+        if len(cleaned_interest_ids) > 20:
+            raise ValueError(
+                "No more than 20 interests "
+                "may be selected."
+            )
+
+        updates["interest_ids"] = (
+            cleaned_interest_ids
+        )
+
+    if "profile_photo_url" in profile_data:
+        profile_photo_url = str(
+            profile_data.get(
+                "profile_photo_url",
+                ""
+            )
+        ).strip()
+
+        if len(profile_photo_url) > 2000:
+            raise ValueError(
+                "Profile photo URL is too long."
+            )
+
+        updates["profile_photo_url"] = (
+            profile_photo_url
+        )
+
+    if not updates:
+        raise ValueError(
+            "No editable profile fields "
+            "were provided."
+        )
+
+    updates["updated_at"] = (
+        datetime.now(
+            timezone.utc
+        ).isoformat()
+    )
+
+    profile_reference.update(updates)
+
+    return retrieve_profile_api(user_id)
 
 # ---------------------------------------------------------
 # Events
@@ -1196,7 +1390,46 @@ def api(request):
             status_code = 201 if was_created else 200
             return jsonify(profile), status_code
 
-                # -----------------------------------------------------
+        # -----------------------------------------------------
+        # PUT /api/profiles
+        # -----------------------------------------------------
+
+        if (
+            request.method == "PUT"
+            and path_parts == ["api", "profiles"]
+        ):
+            profile_data = request.get_json(
+                silent=True
+            )
+
+            if not isinstance(profile_data, dict):
+                return jsonify({
+                    "error": (
+                        "A JSON request body is required"
+                    )
+                }), 400
+
+            try:
+                updated_profile = update_profile_api(
+                    authenticated_user_id,
+                    profile_data
+                )
+            except ValueError as error:
+                return jsonify({
+                    "error": str(error)
+                }), 400
+
+            if not updated_profile:
+                return jsonify({
+                    "error": (
+                        "Profile not found for "
+                        "authenticated user"
+                    )
+                }), 404
+
+            return jsonify(updated_profile), 200
+
+        # -----------------------------------------------------
         # POST /api/events
         # -----------------------------------------------------
 
@@ -1370,7 +1603,7 @@ def api(request):
             status_code = 201 if was_created else 200
             return jsonify(connection), status_code
 
-                # -----------------------------------------------------
+        # -----------------------------------------------------
         # PUT /api/connections/{connection_id}
         # -----------------------------------------------------
 
@@ -1379,44 +1612,44 @@ def api(request):
             and len(path_parts) == 3
             and path_parts[:2] == ["api", "connections"]
         ):
-                connection_id = path_parts[2]
+            connection_id = path_parts[2]
 
-                request_data = request.get_json(
-                    silent=True
+            request_data = request.get_json(
+                silent=True
+            )
+
+            if not isinstance(request_data, dict):
+                return jsonify({
+                    "error": "A JSON request body is required"
+                }), 400
+
+            status = str(
+                request_data.get("status", "")
+            ).strip().lower()
+
+            try:
+                connection = update_connection_api(
+                    connection_id,
+                    authenticated_user_id,
+                    status
                 )
 
-                if not isinstance(request_data, dict):
-                    return jsonify({
-                        "error": "A JSON request body is required"
-                    }), 400
+            except PermissionError as error:
+                return jsonify({
+                    "error": str(error)
+                }), 403
 
-                status = str(
-                    request_data.get("status", "")
-                ).strip().lower()
+            except ValueError as error:
+                return jsonify({
+                    "error": str(error)
+                }), 400
 
-                try:
-                    connection = update_connection_api(
-                        connection_id,
-                        authenticated_user_id,
-                        status
-                    )
+            if not connection:
+                return jsonify({
+                    "error": "Connection request not found"
+                }), 404
 
-                except PermissionError as error:
-                    return jsonify({
-                        "error": str(error)
-                    }), 403
-
-                except ValueError as error:
-                    return jsonify({
-                        "error": str(error)
-                    }), 400
-
-                if not connection:
-                    return jsonify({
-                        "error": "Connection request not found"
-                    }), 404
-
-                return jsonify(connection), 200
+            return jsonify(connection), 200
 
         # -----------------------------------------------------
         # GET, PUT, DELETE /api/events/{event_id}/rsvp

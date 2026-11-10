@@ -153,6 +153,16 @@ def create_profile(
         authorization=authorization
     )
 
+def update_profile(
+    profile_data,
+    authorization
+):
+    return _put(
+        "/api/profiles",
+        payload=profile_data,
+        authorization=authorization
+    )
+
 
 # ---------------------------------------------------------
 # Events
