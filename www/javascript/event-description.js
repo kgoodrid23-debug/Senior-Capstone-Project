@@ -3,6 +3,12 @@ import {
   authenticatedFetch
 } from "./firebase-auth.js";
 
+import {
+  setProfileImage
+} from "./profile-image.js";
+import {
+  setEventImage
+} from "./event-image.js";
 document.addEventListener(
   "DOMContentLoaded",
   loadEventDescription
@@ -57,77 +63,100 @@ function getApiUrl(path) {
 
 async function loadEventDetails(eventId) {
   try {
-    const response = await authenticatedFetch(
-      getApiUrl(`/api/events/${encodeURIComponent(eventId)}`),
-      {
-        headers: {
-          Accept: "application/json"
+    const response =
+      await authenticatedFetch(
+        getApiUrl(
+          `/api/events/${encodeURIComponent(eventId)}`
+        ),
+        {
+          headers: {
+            Accept: "application/json"
+          }
         }
-      }
-    );
+      );
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      throw new Error(
+        `HTTP ${response.status}`
+      );
     }
 
-    const data = await response.json();
+    const data =
+      await response.json();
 
-    console.log("Event details response:", data);
+    console.log(
+      "Event details response:",
+      data
+    );
 
-    // Support either a direct event object or a wrapped event
-    const event = data.event || data;
+    // Support a direct event object or
+    // an object wrapped inside "event".
+    const event =
+      data.event || data;
 
-    document.getElementById("eventTitle").textContent =
-      event.title || "Untitled Event";
+    document.getElementById(
+      "eventTitle"
+    ).textContent =
+      event.title ||
+      event.event_name ||
+      "Untitled Event";
 
-    document.getElementById("eventDate").textContent =
-      event.start_time
-        ? new Date(event.start_time).toLocaleString()
-        : event.date || "Date unavailable";
+    const eventDate =
+      event.start_time ||
+      event.date;
 
-    document.getElementById("eventLocation").textContent =
-      event.location || "Location unavailable";
+    document.getElementById(
+      "eventDate"
+    ).textContent =
+      eventDate
+        ? new Date(eventDate)
+            .toLocaleString()
+        : "Date unavailable";
 
-    document.getElementById("eventCategory").textContent =
-      event.category || "Event";
+    document.getElementById(
+      "eventLocation"
+    ).textContent =
+      event.location ||
+      "Location unavailable";
 
-    document.getElementById("eventDescription").textContent =
-      event.description || "No description available.";
+    document.getElementById(
+      "eventCategory"
+    ).textContent =
+      event.category ||
+      "Event";
+
+    document.getElementById(
+      "eventDescription"
+    ).textContent =
+      event.description ||
+      "No description available.";
 
     const image =
-      document.getElementById("eventImage");
+      document.getElementById(
+        "eventImage"
+      );
 
-    const imageUrl = String(
-      event.image_url || ""
-    ).trim();
-
-    if (image && imageUrl) {
-      image.onload = () => {
-        image.hidden = false;
-      };
-
-      image.onerror = () => {
-        console.error(
-          "Unable to load event image:",
-          imageUrl
-        );
-
-        image.hidden = true;
-      };
-
-      image.src = imageUrl;
-    } else if (image) {
-      image.removeAttribute("src");
-      image.hidden = true;
-    }
-
+    setEventImage(
+      image,
+      event.image_url,
+      event.title ||
+        event.event_name ||
+        "Event"
+    );
   } catch (error) {
-    console.error("Unable to load event details:", error);
+    console.error(
+      "Unable to load event details:",
+      error
+    );
 
-    document.getElementById("eventTitle").textContent =
+    document.getElementById(
+      "eventTitle"
+    ).textContent =
       "Unable to load event";
 
-    document.getElementById("eventDescription").textContent =
+    document.getElementById(
+      "eventDescription"
+    ).textContent =
       "Event information is currently unavailable.";
   }
 }
@@ -171,12 +200,17 @@ async function loadEventAttendees(eventId) {
       const card = document.createElement("div");
       card.className = "event-attendee-card";
 
-      const avatar = document.createElement("img");
-      avatar.className = "event-attendee-avatar";
-      avatar.src =
-        attendee.profile_photo_url ||
-        "assets/default-profile.png";
-      avatar.alt = "Attendee profile picture";
+      const avatar =
+      document.createElement("img");
+
+      avatar.className =
+        "event-attendee-avatar";
+
+      setProfileImage(
+        avatar,
+        attendee.profile_photo_url,
+        attendee.display_name || "User"
+      );
 
       const info = document.createElement("div");
       info.className = "event-attendee-info";

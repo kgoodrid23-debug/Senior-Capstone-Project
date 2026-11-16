@@ -1,6 +1,13 @@
 import {
   authenticatedFetch
 } from "./firebase-auth.js";
+import {
+  setProfileImage
+} from "./profile-image.js";
+import {
+  setEventBackground
+} from "./event-image.js";
+
 
 document.addEventListener(
   "DOMContentLoaded",
@@ -93,35 +100,12 @@ function renderProfile(profile) {
     bioElement.textContent = profile.bio || "";
   }
 
- if (photoElement) {
-  const photoUrl = String(
-    profile.profile_photo_url || ""
-  ).trim();
+    setProfileImage(
+    photoElement,
+    profile.profile_photo_url,
+    displayName
+    );
 
-  if (photoUrl) {
-    photoElement.onload = () => {
-      photoElement.style.display = "block";
-    };
-
-    photoElement.onerror = () => {
-      console.error(
-        "Unable to load profile photo:",
-        photoUrl
-      );
-
-      photoElement.style.display = "none";
-    };
-
-    photoElement.src = photoUrl;
-    photoElement.alt =
-      `${displayName} portrait`;
-
-    photoElement.style.display = "block";
-  } else {
-    photoElement.removeAttribute("src");
-    photoElement.style.display = "none";
-  }
-}
 
   renderInterests(interestsElement, profile.interests);
 }
@@ -223,22 +207,12 @@ function createProfileEventCard(event) {
   const image = document.createElement("div");
   image.className = "event-image";
 
-  const imageUrl = String(
-    event.image_url || ""
-  ).trim();
-
-  if (imageUrl) {
-    image.style.backgroundImage =
-      `url("${imageUrl}")`;
-
-    image.style.backgroundPosition = "center";
-    image.style.backgroundSize = "cover";
-    image.style.backgroundRepeat = "no-repeat";
-  } else {
-    image.classList.add(
-      "event-image-placeholder"
-    );
-  }
+  setEventBackground(
+    image,
+    event.image_url,
+    event.title || "Event"
+  );
+  
 
   const content = document.createElement("div");
   content.className = "event-content";

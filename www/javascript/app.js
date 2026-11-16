@@ -3,6 +3,13 @@ import {
   authenticatedFetch
 } from "./firebase-auth.js";
 
+import {
+  setProfileBackground
+} from "./profile-image.js";
+
+import {
+  setEventBackground
+} from "./event-image.js";
 
 document.addEventListener(
   "DOMContentLoaded",
@@ -111,6 +118,31 @@ function getApiUrl(path) {
   return `${baseUrl}${normalizedPath}`;
 }
 
+function formatEventDateCentral(value) {
+  if (!value) {
+    return "Date unavailable";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Date unavailable";
+  }
+
+  return new Intl.DateTimeFormat(
+    "en-US",
+    {
+      timeZone: "America/Chicago",
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      timeZoneName: "short"
+    }
+  ).format(date);
+}
 
 function renderProfile(
   profile,
@@ -139,48 +171,11 @@ function renderProfile(
   }
 
   if (profileImageEl) {
-    const photoUrl = String(
-      profile.profile_photo_url || ""
-    ).trim();
-
-    if (photoUrl) {
-      profileImageEl.style.backgroundImage =
-        `url("${photoUrl}")`;
-
-      profileImageEl.style.backgroundPosition =
-        "center";
-
-      profileImageEl.style.backgroundSize =
-        "cover";
-
-      profileImageEl.style.backgroundRepeat =
-        "no-repeat";
-
-      profileImageEl.classList.remove(
-        "profile-avatar-placeholder"
-      );
-
-      profileImageEl.classList.add(
-        "has-image"
-      );
-
-      profileImageEl.setAttribute(
-        "aria-label",
-        `${profile.display_name || "User"} profile photo`
-      );
-    } else {
-      profileImageEl.style.removeProperty(
-        "background-image"
-      );
-
-      profileImageEl.classList.add(
-        "profile-avatar-placeholder"
-      );
-
-      profileImageEl.classList.remove(
-        "has-image"
-      );
-    }
+    setProfileBackground(
+  profileImageEl,
+  profile.profile_photo_url,
+  profile.display_name || "User"
+    );
   }
 
   if (profileInterestsEl) {
@@ -219,40 +214,51 @@ function renderEvents(events, eventsGridEl) {
   }
 
   events.forEach((event) => {
-    const card = document.createElement("article");
+  // Ignore malformed or missing event records.
+  if (
+    !event ||
+    typeof event !== "object" ||
+    Array.isArray(event)
+  ) {
+    console.warn(
+      "Skipping invalid event:",
+      event
+    );
 
-    card.className =
-      "event-card home-event-card";
+    return;
+  }
 
-    // Enable navigation to the event description page
-    const eventId =
-      event.document_id || event.event_id;
+  const card = document.createElement("article");
 
-    if (eventId) {
-      card.dataset.eventId = String(eventId);
-      card.tabIndex = 0;
-      card.setAttribute("role", "link");
-    }
+  card.className =
+    "event-card home-event-card";
 
-    const image = document.createElement("div");
-    image.className = "event-image";
+  const eventId =
+    event.document_id ||
+    event.event_id;
 
-    const imageUrl = String(
-      event.image_url || ""
-    ).trim();
+  if (eventId) {
+    card.dataset.eventId =
+      String(eventId);
 
-    if (imageUrl) {
-      image.style.backgroundImage =
-        `url("${imageUrl}")`;
+    card.tabIndex = 0;
+    card.setAttribute("role", "link");
+  }
 
-      image.style.backgroundPosition = "center";
-      image.style.backgroundSize = "cover";
-      image.style.backgroundRepeat = "no-repeat";
-    } else {
-      image.classList.add(
-        "event-image-placeholder"
-      );
-    }
+  const image =
+    document.createElement("div");
+
+  image.className = "event-image";
+
+  setEventBackground(
+    image,
+    event.image_url,
+    event.title ||
+      event.event_name ||
+      "Event"
+  );
+
+  // Continue with the rest of your existing card code...
 
     const body = document.createElement("div");
     body.className = "event-body";
@@ -262,7 +268,7 @@ function renderEvents(events, eventsGridEl) {
     const title = document.createElement("div");
     title.className = "event-title";
     title.textContent =
-      event.title || "Untitled event";
+      event.title || event.event_name || "Untitled event";
 
     const meta = document.createElement("div");
     meta.className = "event-meta";
@@ -270,8 +276,8 @@ function renderEvents(events, eventsGridEl) {
     meta.append(
       createMetaLine(
         "🗓",
-        event.date ||
-        event.start_time ||
+        formatEventDateCentral(event.date) ||
+        formatEventDateCentral(event.start_time) ||
         "Date unavailable"
       ),
       createMetaLine(
@@ -302,7 +308,7 @@ function renderEvents(events, eventsGridEl) {
     body.append(copy, rsvpButton);
     card.append(image, body);
 
-    eventsGridEl.appendChild(card);
+     eventsGridEl.appendChild(card);
   });
 }
 
