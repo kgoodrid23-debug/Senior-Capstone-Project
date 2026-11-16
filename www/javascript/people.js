@@ -2,7 +2,9 @@ import {
   authenticatedFetch,
   waitForAuthenticatedUser
 } from "./firebase-auth.js";
-
+import {
+  setProfileImage
+} from "./profile-image.js";
 
 let currentUserId = "";
 let allProfiles = [];
@@ -200,60 +202,19 @@ function createProfileCard(profile) {
   photoContainer.className =
   "directory-person-photo person-photo-container";
 
-  if (profile.profile_photo_url) {
-  const photo = document.createElement("img");
+  const photo =
+  document.createElement("img");
 
-  photo.className =
-    "person-photo person-avatar";
+photo.className =
+  "person-photo person-avatar";
 
-  photo.alt =
-    `${profile.display_name || "User"} profile`;
+setProfileImage(
+  photo,
+  profile.profile_photo_url,
+  profile.display_name || "User"
+);
 
-  const photoUrl = String(
-    profile.profile_photo_url
-  ).trim();
-
-  photo.onload = () => {
-    photo.style.display = "block";
-  };
-
-  photo.onerror = () => {
-    console.error(
-      "Unable to load People page photo:",
-      photoUrl
-    );
-
-    const placeholder =
-      document.createElement("div");
-
-    placeholder.className =
-      "person-photo person-avatar " +
-      "person-avatar-placeholder";
-
-    placeholder.textContent = getInitial(
-      profile.display_name
-    );
-
-    photo.replaceWith(placeholder);
-  };
-
-  photo.src = photoUrl;
-
-  photoContainer.appendChild(photo);
-} else {
-  const placeholder =
-    document.createElement("div");
-
-  placeholder.className =
-    "person-photo person-avatar " +
-    "person-avatar-placeholder";
-
-  placeholder.textContent = getInitial(
-    profile.display_name
-  );
-
-  photoContainer.appendChild(placeholder);
-}
+photoContainer.appendChild(photo);
 
   const content =
     document.createElement("div");

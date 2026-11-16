@@ -1,4 +1,7 @@
 import { authenticatedFetch } from "./firebase-auth.js";
+import {
+  setEventBackground
+} from "./event-image.js";
 document.addEventListener("DOMContentLoaded", loadEvents);
 
 
@@ -134,22 +137,12 @@ function createEventCard(event) {
   const image = document.createElement("div");
   image.className = "event-image";
 
-  const imageUrl = String(
-    event.image_url || ""
-  ).trim();
+  setEventBackground(
+    image,
+    event.image_url,
+    event.title || "Event"
+  );
 
-  if (imageUrl) {
-    image.style.backgroundImage =
-      `url("${imageUrl}")`;
-
-    image.style.backgroundPosition = "center";
-    image.style.backgroundSize = "cover";
-    image.style.backgroundRepeat = "no-repeat";
-  } else {
-    image.classList.add(
-      "event-image-placeholder"
-    );
-  }
 
   // Event content
   const content = document.createElement("div");

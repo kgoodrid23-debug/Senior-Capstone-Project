@@ -1144,6 +1144,15 @@
   height: 100%;
   object-fit: cover;
 }
+.person-avatar {
+  width: 88px;
+  height: 88px;
+  flex: 0 0 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+  background: #eef1ff;
+}
 
 /* Responsive Layout */
 
