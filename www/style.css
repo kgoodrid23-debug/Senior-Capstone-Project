@@ -394,6 +394,16 @@
     .connections-panel {
       padding: 20px 22px;
     }
+    .connection-profile-photo {
+      display: block;
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 10px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center;
+      background-color: #eef1ff;
+    }
 
     .panel-heading {
       display: flex;

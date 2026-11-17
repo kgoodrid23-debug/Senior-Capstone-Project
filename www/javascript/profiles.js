@@ -375,20 +375,19 @@ async function loadProfileConnections() {
     for (const profile of matched) {
       const item = document.createElement("div");
       item.className = "connection-item";
-      const photoUrl = String(profile.profile_photo_url || "").trim();
-      const placeholder = document.createElement("div");
-      placeholder.className = "profile-avatar-placeholder";
-      placeholder.style.cssText = "width:64px;height:64px;border-radius:50%;margin:0 auto 10px;";
+      const img =
+        document.createElement("img");
 
-      if (photoUrl) {
-        const img = document.createElement("img");
-        img.alt = `${profile.display_name || "Connection"} profile picture`;
-        img.src = photoUrl;
-        img.onerror = () => img.replaceWith(placeholder);
-        item.appendChild(img);
-      } else {
-        item.appendChild(placeholder);
-      }
+      img.className =
+        "connection-profile-photo";
+
+      setProfileImage(
+        img,
+        profile.profile_photo_url,
+        profile.display_name || "Connection"
+      );
+
+      item.appendChild(img);
 
       const name = document.createElement("span");
       name.textContent = profile.display_name || "Connection";
