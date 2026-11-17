@@ -1,5 +1,6 @@
 import {
-  authenticatedFetch
+  authenticatedFetch,
+  waitForAuthenticatedUser
 } from "./firebase-auth.js";
 import {
   setProfileImage
@@ -55,6 +56,8 @@ async function loadProfilePage() {
     console.error("Profile page load failed:", error);
     showEventsMessage(eventsGrid, "Unable to load upcoming events.");
   }
+
+  await loadProfileConnections();
 }
 
 function getDashboardUrl() {
@@ -324,4 +327,83 @@ function calculateAge(dateOfBirth) {
   }
 
   return age;
+}
+async function loadProfileConnections() {
+  const grid = document.getElementById("profileConnectionsGrid");
+  if (!grid) return;
+
+  try {
+    const user = await waitForAuthenticatedUser();
+    const base = getDashboardUrl().replace(/\/api\/dashboard$/, "");
+    const [connectionsResponse, profilesResponse] = await Promise.all([
+      authenticatedFetch(`${base}/api/users/${encodeURIComponent(user.uid)}/connections`, {
+        headers: { Accept: "application/json" }
+      }),
+      authenticatedFetch(`${base}/api/profiles`, {
+        headers: { Accept: "application/json" }
+      })
+    ]);
+
+    if (!connectionsResponse.ok || !profilesResponse.ok) {
+      throw new Error("Unable to retrieve connections or profiles.");
+    }
+
+    const connections = await connectionsResponse.json();
+    const profiles = await profilesResponse.json();
+    const acceptedIds = new Set();
+
+    for (const connection of Array.isArray(connections) ? connections : []) {
+      if (String(connection.status).toLowerCase() !== "accepted") continue;
+      const otherId = connection.requester_user_id === user.uid
+        ? connection.recipient_user_id
+        : connection.recipient_user_id === user.uid
+          ? connection.requester_user_id
+          : null;
+      if (otherId) acceptedIds.add(otherId);
+    }
+
+    grid.replaceChildren();
+    const matched = (Array.isArray(profiles) ? profiles : [])
+      .filter(profile => acceptedIds.has(profile.user_id))
+      .slice(0, 4);
+
+    if (!matched.length) {
+      showConnectionsMessage(grid, "No connections yet.");
+      return;
+    }
+
+    for (const profile of matched) {
+      const item = document.createElement("div");
+      item.className = "connection-item";
+      const photoUrl = String(profile.profile_photo_url || "").trim();
+      const placeholder = document.createElement("div");
+      placeholder.className = "profile-avatar-placeholder";
+      placeholder.style.cssText = "width:64px;height:64px;border-radius:50%;margin:0 auto 10px;";
+
+      if (photoUrl) {
+        const img = document.createElement("img");
+        img.alt = `${profile.display_name || "Connection"} profile picture`;
+        img.src = photoUrl;
+        img.onerror = () => img.replaceWith(placeholder);
+        item.appendChild(img);
+      } else {
+        item.appendChild(placeholder);
+      }
+
+      const name = document.createElement("span");
+      name.textContent = profile.display_name || "Connection";
+      item.appendChild(name);
+      grid.appendChild(item);
+    }
+  } catch (error) {
+    console.error("Connections load failed:", error);
+    showConnectionsMessage(grid, "Unable to load connections.");
+  }
+}
+
+function showConnectionsMessage(grid, message) {
+  grid.replaceChildren();
+  const text = document.createElement("p");
+  text.textContent = message;
+  grid.appendChild(text);
 }
