@@ -1388,3 +1388,23 @@
 .directory-actions {display:flex;flex-direction:column;align-items:flex-end;gap:12px;}
 .directory-actions .action-btn {padding:10px 20px;text-decoration:none;}
 #createEventBtn[hidden] {display:none !important;}
+
+.admin-page { padding-top: 40px; padding-bottom: 60px; }
+.admin-page h1 { margin-bottom: 8px; }
+.admin-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin: 30px 0 20px; }
+.admin-toolbar input { width: 320px; max-width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+.admin-table-wrapper { overflow-x: auto; background: white; border: 1px solid #e5e7eb; border-radius: 12px; }
+.admin-table { width: 100%; border-collapse: collapse; text-align: left; }
+.admin-table th, .admin-table td { padding: 16px; border-bottom: 1px solid #eee; }
+.admin-table th { background: #f8f9fc; font-weight: 600; }
+.admin-table select { padding: 8px; border: 1px solid #ddd; border-radius: 6px; }
+.admin-table button { padding: 9px 18px; background: #3f55f4; color: white; border: none; border-radius: 6px; cursor: pointer; }
+.admin-table button:hover { background: #3043cc; }
+.admin-table button:disabled { opacity: .5; cursor: not-allowed; }
+#admin-message { margin-top: 16px; }
+.admin-save-section { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 24px; }
+.admin-save-section button { padding: 12px 24px; background: #3f55f4; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.admin-save-section button:hover:not(:disabled) { background: #3043cc; }
+.admin-save-section button:disabled { opacity: .5; cursor: not-allowed; }
+#unsaved-count { color: #666; font-size: 14px; }
+.admin-table tr.unsaved-change { background: #fff9e6; }

@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buddiez &amp; Bandz | Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="directory-page-body">
+  <header class="site-header">
+    <div class="page header-inner">
+      <a href="index.html" class="brand">
+        <div class="brand-icon"><span></span></div>
+        <div class="brand-copy">
+          Buddiez &amp; Bandz
+          <small>ADMINISTRATION</small>
+        </div>
+      </a>
+      <nav class="nav">
+        <a class="nav-link" href="index.html">Home</a>
+        <a class="nav-link" href="events.html">Events</a>
+        <a class="nav-link" href="people.html">People</a>
+        <a class="nav-link" href="profile.html">Profile</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page admin-page" hidden>
+    <h1>Account Management</h1>
+    <p>Manage registered users and organizer permissions.</p>
+
+    <div class="admin-toolbar">
+      <input type="search" id="user-search"
+        placeholder="Search users...">
+      <span id="user-count"></span>
+    </div>
+
+    <div class="admin-table-wrapper">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Current Role</th>
+            <th>Change Role</th>
+          </tr>
+        </thead>
+        <tbody id="users-table">
+          <tr>
+            <td colspan="3">Loading users...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p id="admin-message" role="status"></p>
+  </main>
+
+  <script type="module" src="javascript/admin.js"></script>
+</body>
+</html>
